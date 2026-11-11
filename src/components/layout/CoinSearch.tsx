@@ -45,7 +45,18 @@ export function CoinSearch({ onNavigate }: { onNavigate?: () => void }) {
       data={results.map((coin) => ({ value: coin.id, label: coin.name }))}
       filter={({ options }) => options}
       nothingFoundMessage={active && !loading ? "No coins found" : undefined}
-      comboboxProps={{ width: 300, position: "bottom-end" }}
+      comboboxProps={{
+        width: 300,
+        position: "bottom-end",
+        styles: {
+          dropdown: {
+            maxHeight: "min(320px, 60dvh)",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+          },
+        },
+      }}
+      withScrollArea={false}
       renderOption={({ option }) => {
         const coin = byId.get(option.value);
         return (
