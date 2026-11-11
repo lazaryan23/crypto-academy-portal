@@ -1,16 +1,16 @@
 import { createTheme, type MantineColorsTuple } from "@mantine/core";
 
 const brand: MantineColorsTuple = [
-  "#e6fcf5",
-  "#c3fae8",
-  "#96f2d7",
-  "#63e6be",
-  "#38d9a9",
-  "#20c997",
-  "#12b886",
-  "#0ca678",
-  "#099268",
-  "#087f5b",
+  "#e3fbff",
+  "#c4f3fd",
+  "#91e7f8",
+  "#5cdaf3",
+  "#34cfee",
+  "#1cc8ec",
+  "#06b6d4",
+  "#0094ad",
+  "#00839a",
+  "#006f83",
 ];
 
 export const theme = createTheme({
@@ -21,6 +21,7 @@ export const theme = createTheme({
   fontFamilyMonospace: "var(--font-mono), ui-monospace, monospace",
   headings: { fontFamily: "var(--font-inter), system-ui, sans-serif", fontWeight: "700" },
   defaultRadius: "md",
+  defaultGradient: { from: "cyan", to: "violet", deg: 120 },
   cursorType: "pointer",
   components: {
     Card: { defaultProps: { withBorder: true, radius: "lg" } },

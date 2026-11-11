@@ -1,0 +1,30 @@
+.row {
+  cursor: pointer;
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+  will-change: transform;
+}
+
+.row:hover {
+  transform: scale(1.012);
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(139, 92, 246, 0.1));
+  box-shadow: 0 8px 24px -16px rgba(34, 211, 238, 0.6);
+}
+
+.row:hover .coinName {
+  color: var(--mantine-color-cyan-4);
+}
+
+.coinName {
+  transition: color 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .row:hover {
+    transition: none;
+    transform: none;
+  }
+}

@@ -7,13 +7,14 @@ import type { CoinMarket } from "@/types/coingecko";
 import { formatCompactUsd, formatPrice } from "@/lib/format";
 import { PercentChange } from "@/components/common/PercentChange";
 import { Sparkline } from "@/components/common/Sparkline";
+import classes from "./MarketTable.module.css";
 
 export function MarketTable({ coins }: { coins: CoinMarket[] }) {
   const router = useRouter();
 
   return (
     <TableScrollContainer minWidth={360}>
-      <Table highlightOnHover verticalSpacing="sm" horizontalSpacing="md">
+      <Table verticalSpacing="sm" horizontalSpacing="md">
         <TableThead>
           <TableTr>
             <TableTh w={48}>#</TableTh>
@@ -39,7 +40,7 @@ export function MarketTable({ coins }: { coins: CoinMarket[] }) {
             <TableTr
               key={coin.id}
               onClick={() => router.push(`/crypto/${coin.id}`)}
-              style={{ cursor: "pointer" }}
+              className={classes.row}
             >
               <TableTd>
                 <Text size="sm" c="dimmed">
@@ -56,6 +57,7 @@ export function MarketTable({ coins }: { coins: CoinMarket[] }) {
                       fw={600}
                       size="sm"
                       truncate
+                      className={classes.coinName}
                       onClick={(e) => e.stopPropagation()}
                     >
                       {coin.name}

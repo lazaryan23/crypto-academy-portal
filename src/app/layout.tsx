@@ -7,6 +7,7 @@ import { theme } from "@/theme";
 import { siteConfig } from "@/config/site";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const mono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"] });
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1a1b1e",
+  themeColor: "#0b1020",
   width: "device-width",
   initialScale: 1,
 };
@@ -52,7 +53,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="dark">
-          <SiteShell footer={<SiteFooter />}>{children}</SiteShell>
+          <MotionProvider>
+            <SiteShell footer={<SiteFooter />}>{children}</SiteShell>
+          </MotionProvider>
         </MantineProvider>
       </body>
     </html>

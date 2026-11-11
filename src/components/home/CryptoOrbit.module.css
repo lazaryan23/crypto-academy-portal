@@ -1,0 +1,196 @@
+.root {
+  position: relative;
+  width: min(460px, 100%);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  container-type: inline-size;
+  isolation: isolate;
+}
+
+.glow {
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.55), rgba(139, 92, 246, 0.35) 45%, transparent 70%);
+  filter: blur(18px);
+  animation: breathe 4s ease-in-out infinite;
+  z-index: -1;
+  will-change: transform, opacity;
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--mantine-color-cyan-4) 35%, transparent);
+  will-change: transform;
+}
+
+.ringOuter {
+  inset: 3%;
+  animation: spin 48s linear infinite;
+}
+
+.ringInner {
+  inset: 22%;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--mantine-color-violet-4) 30%, transparent);
+  animation: spin 32s linear infinite reverse;
+}
+
+.ringOuter .counter {
+  animation: spin 48s linear infinite reverse;
+}
+
+.ringInner .counter {
+  animation: spin 32s linear infinite;
+}
+
+.slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(var(--angle) * -1));
+}
+
+.counter {
+  position: absolute;
+  translate: -50% -50%;
+  will-change: transform;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: clamp(36px, 12.5cqw, 56px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 800;
+  font-size: clamp(15px, 5.2cqw, 24px);
+  line-height: 1;
+  text-decoration: none;
+  background: var(--coin-bg);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 8px 24px -6px var(--coin-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.badge:hover,
+.badge:focus-visible {
+  transform: scale(1.18);
+  box-shadow:
+    0 12px 32px -4px var(--coin-shadow),
+    0 0 0 3px rgba(255, 255, 255, 0.18);
+}
+
+.root:hover .ring,
+.root:hover .counter,
+.root:focus-within .ring,
+.root:focus-within .counter {
+  animation-play-state: paused;
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 30cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-size: 15cqw;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  background: radial-gradient(circle at 30% 25%, #ffc46b, #f7931a 55%, #c86d05);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 0 40px rgba(247, 147, 26, 0.45),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  z-index: 2;
+}
+
+.center::before,
+.center::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(34, 211, 238, 0.55);
+  animation: pulse 2.8s ease-out infinite;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.center::after {
+  animation-delay: 1.4s;
+  border-color: rgba(167, 139, 250, 0.55);
+}
+
+.spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--mantine-color-cyan-3);
+  box-shadow: 0 0 8px var(--mantine-color-cyan-3);
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow,
+  .ring,
+  .counter,
+  .center::before,
+  .center::after,
+  .spark {
+    animation: none;
+  }
+}
