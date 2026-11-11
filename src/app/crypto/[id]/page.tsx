@@ -1,0 +1,128 @@
+import type { Metadata } from "next";
+import { AnchorLink } from "@/components/common/Links";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { Avatar, Badge, Breadcrumbs, Container, Group, Stack, Text, Title } from "@mantine/core";
+import { getCoin, getErrorStatus } from "@/lib/coingecko";
+import { coinProfiles } from "@/content/coin-profiles";
+import { formatPrice } from "@/lib/format";
+import { siteConfig } from "@/config/site";
+import { PercentChange } from "@/components/common/PercentChange";
+import { Disclaimer } from "@/components/common/Disclaimer";
+import { ChartTabs } from "@/components/crypto/ChartTabs";
+import { CoinStats } from "@/components/crypto/CoinStats";
+import { CoinAbout } from "@/components/crypto/CoinAbout";
+import { WhereToBuy } from "@/components/crypto/WhereToBuy";
+import { CoinDetailSkeleton } from "@/components/crypto/CoinDetailSkeleton";
+
+const prerenderedIds = ["bitcoin", "ethereum", "solana", "the-open-network"];
+
+export function generateStaticParams() {
+  return prerenderedIds.map((id) => ({ id }));
+}
+
+async function loadCoin(id: string) {
+  try {
+    return await getCoin(id);
+  } catch (error) {
+    if (getErrorStatus(error) === 404) notFound();
+    throw error;
+  }
+}
+
+export async function generateMetadata({ params }: PageProps<"/crypto/[id]">): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const coin = await getCoin(id);
+    const symbol = coin.symbol.toUpperCase();
+    const price = formatPrice(coin.market_data.current_price.usd);
+    const title = `${coin.name} (${symbol}) Price Today, Live Chart & Market Cap`;
+    const description = `${coin.name} price is ${price} USD. Live ${symbol} chart, all-time high, circulating supply, history and where to buy or trade ${symbol}.`;
+    return {
+      title,
+      description,
+      alternates: { canonical: `/crypto/${coin.id}` },
+      openGraph: { title, description, url: `/crypto/${coin.id}`, images: [{ url: coin.image.large }] },
+    };
+  } catch {
+    return { title: "Cryptocurrency price & chart", alternates: { canonical: `/crypto/${id}` } };
+  }
+}
+
+async function CoinDetails({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const coin = await loadCoin(id);
+  const symbol = coin.symbol.toUpperCase();
+  const tvSymbol = `BINANCE:${coinProfiles[coin.id]?.tradingSymbol ?? symbol}USDT`;
+  const m = coin.market_data;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Markets", item: `${siteConfig.url}/` },
+      { "@type": "ListItem", position: 2, name: coin.name, item: `${siteConfig.url}/crypto/${coin.id}` },
+    ],
+  };
+
+  return (
+    <Stack gap="xl">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Breadcrumbs>
+        <AnchorLink href="/" size="sm">
+          Markets
+        </AnchorLink>
+        <Text size="sm" c="dimmed">
+          {coin.name}
+        </Text>
+      </Breadcrumbs>
+
+      <Group justify="space-between" align="flex-end" gap="lg">
+        <Group gap="md" wrap="nowrap">
+          <Avatar src={coin.image.large} alt={coin.name} size={56} />
+          <Stack gap={2}>
+            <Group gap="xs">
+              <Title order={1} fz={{ base: 26, sm: 34 }}>
+                {coin.name}
+              </Title>
+              <Badge variant="light" color="gray">
+                {symbol}
+              </Badge>
+              {coin.market_cap_rank && <Badge variant="light">Rank #{coin.market_cap_rank}</Badge>}
+            </Group>
+            <Text c="dimmed" size="sm">
+              {coin.name} price in USD
+            </Text>
+          </Stack>
+        </Group>
+        <Stack gap={0} align="flex-end">
+          <Text fz={{ base: 28, sm: 36 }} fw={800} ff="monospace">
+            {formatPrice(m.current_price.usd)}
+          </Text>
+          <Group gap={6}>
+            <PercentChange value={m.price_change_percentage_24h} size="md" />
+            <Text size="sm" c="dimmed">
+              24h
+            </Text>
+          </Group>
+        </Stack>
+      </Group>
+
+      <ChartTabs coinId={coin.id} tradingViewSymbol={tvSymbol} />
+      <CoinStats coin={coin} />
+      <WhereToBuy name={coin.name} symbol={coin.symbol} />
+      <CoinAbout coin={coin} />
+      <Disclaimer />
+    </Stack>
+  );
+}
+
+export default function CoinPage({ params }: PageProps<"/crypto/[id]">) {
+  return (
+    <Container size="xl" py="xl">
+      <Suspense fallback={<CoinDetailSkeleton />}>
+        <CoinDetails params={params} />
+      </Suspense>
+    </Container>
+  );
+}
