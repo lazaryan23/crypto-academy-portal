@@ -67,7 +67,7 @@ async function CoinDetails({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <Stack gap="xl">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Breadcrumbs>
         <AnchorLink href="/" size="sm">
           Markets

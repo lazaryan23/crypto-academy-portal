@@ -56,7 +56,7 @@ async function GuideArticle({ params }: { params: Promise<{ slug: string }> }) {
 
   return (
     <Grid gap={48}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <GridCol span={{ base: 12, md: 8 }}>
         <Stack gap="xl" component="article">
           <Breadcrumbs>
