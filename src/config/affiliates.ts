@@ -15,8 +15,8 @@ export const exchanges: Record<ExchangeId, ExchangeAffiliate> = {
   binance: {
     id: "binance",
     name: "Binance",
-    referralUrl: "https://accounts.binance.com/register?ref=YOUR_BINANCE_CODE",
-    promoCode: "YOUR_BINANCE_CODE",
+    referralUrl: "https://accounts.binance.com/register?ref=893929842&registerChannel=user_center",
+    promoCode: "893929842",
     headline: "Up to 20% off trading fees",
     perks: ["Largest spot liquidity", "USDⓈ-M & COIN-M futures", "Fee discount with our code"],
     color: "yellow",
@@ -25,8 +25,8 @@ export const exchanges: Record<ExchangeId, ExchangeAffiliate> = {
   bybit: {
     id: "bybit",
     name: "Bybit",
-    referralUrl: "https://www.bybit.com/invite?ref=YOUR_BYBIT_CODE",
-    promoCode: "YOUR_BYBIT_CODE",
+    referralUrl: "https://www.bybit.com/invite?ref=M6MQKYM",
+    promoCode: "M6MQKYM",
     headline: "Up to $100 deposit bonus",
     perks: ["Derivatives-first platform", "Demo trading account", "New-user deposit rewards"],
     color: "orange",
@@ -35,8 +35,8 @@ export const exchanges: Record<ExchangeId, ExchangeAffiliate> = {
   okx: {
     id: "okx",
     name: "OKX",
-    referralUrl: "https://www.okx.com/join/YOUR_OKX_CODE",
-    promoCode: "YOUR_OKX_CODE",
+    referralUrl: "https://www.okx.com/join/3UKNM262",
+    promoCode: "3UKNM262",
     headline: "Fee discount for new users",
     perks: ["Spot, futures & options", "Built-in Web3 wallet", "Copy trading"],
     color: "gray",
@@ -45,8 +45,8 @@ export const exchanges: Record<ExchangeId, ExchangeAffiliate> = {
   bingx: {
     id: "bingx",
     name: "BingX",
-    referralUrl: "https://bingx.com/invite/YOUR_BINGX_CODE",
-    promoCode: "YOUR_BINGX_CODE",
+    referralUrl: "https://bingx.com/invite/AUJTIG/",
+    promoCode: "AUJTIG",
     headline: "Welcome rewards for new traders",
     perks: ["Copy trading marketplace", "Perpetual futures", "Low minimum deposit"],
     color: "blue",
