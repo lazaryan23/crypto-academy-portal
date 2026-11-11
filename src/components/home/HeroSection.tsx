@@ -42,12 +42,10 @@ export function HeroSection() {
                 </Badge>
               </m.div>
 
-              <m.div variants={item}>
-                <Title order={1} id="hero-title" className={classes.title}>
-                  Track the crypto market.{" "}
-                  <span className={classes.gradientText}>Learn to trade it safely.</span>
-                </Title>
-              </m.div>
+              <Title order={1} id="hero-title" className={classes.title}>
+                Track the crypto market.{" "}
+                <span className={classes.gradientText}>Learn to trade it safely.</span>
+              </Title>
 
               <m.div variants={item}>
                 <Text size="lg" c="dimmed" maw={560}>
