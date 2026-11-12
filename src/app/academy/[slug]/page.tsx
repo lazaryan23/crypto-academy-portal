@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { Anchor, Badge, Box, Breadcrumbs, Card, Container, Grid, GridCol, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight, IconClock } from "@tabler/icons-react";
 import { getGuide, guides } from "@/content/academy";
-import { siteConfig } from "@/config/site";
+import { defaultOgImages, siteConfig } from "@/config/site";
 import { GuideContent } from "@/components/academy/GuideContent";
 import { GuideFaq } from "@/components/academy/GuideFaq";
 import { Disclaimer } from "@/components/common/Disclaimer";
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps<"/academy/[slug]">)
     title: guide.title,
     description: guide.description,
     alternates: { canonical: `/academy/${guide.slug}` },
-    openGraph: { type: "article", title: guide.title, description: guide.description, url: `/academy/${guide.slug}` },
+    openGraph: { type: "article", title: guide.title, description: guide.description, url: `/academy/${guide.slug}`, images: defaultOgImages },
   };
 }
 

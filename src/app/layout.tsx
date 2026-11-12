@@ -45,6 +45,28 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const siteJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${siteConfig.url}/#organization`,
+    name: siteConfig.name,
+    alternateName: "Coin Compass",
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/icon.svg`,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteConfig.url}/#website`,
+    name: siteConfig.name,
+    alternateName: ["Coin Compass", "coincompass.org"],
+    url: siteConfig.url,
+    description: siteConfig.description,
+    publisher: { "@id": `${siteConfig.url}/#organization` },
+  },
+];
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`} {...mantineHtmlProps}>
@@ -52,6 +74,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd).replace(/</g, "\\u003c") }} />
         <MantineProvider theme={theme} defaultColorScheme="dark">
           <MotionProvider>
             <SiteShell footer={<SiteFooter />}>{children}</SiteShell>

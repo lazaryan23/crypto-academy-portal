@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { defaultOgImages } from "@/config/site";
 import { Suspense } from "react";
 import { Badge, Card, Container, SimpleGrid, Skeleton, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
   description:
     "A long-term crypto investing framework: core holdings, top altcoins, the 60/30/10 risk allocation, dollar-cost averaging and rebalancing.",
   alternates: { canonical: "/investing-guide" },
+  openGraph: { url: "/investing-guide", images: defaultOgImages },
 };
 
 function PicksSkeleton() {

@@ -25,5 +25,9 @@ export const siteConfig = {
   ],
 };
 
+export const defaultOgImages = [
+  { url: "/opengraph-image", width: 1200, height: 630, alt: `${siteConfig.name} — ${siteConfig.tagline}` },
+];
+
 export const riskDisclaimer =
   "Educational content only, not financial advice. Crypto assets are highly volatile and leveraged trading can lose more than your initial margin. Do your own research.";

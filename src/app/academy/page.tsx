@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { defaultOgImages } from "@/config/site";
 import { CardLink } from "@/components/common/Links";
 import { Badge, Container, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconArrowsExchange, IconClock, IconScale, IconShieldCheck, IconTrendingUp } from "@tabler/icons-react";
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
   description:
     "Free crypto trading academy: spot vs futures, how to open long and short positions, leverage from 1x to 50x, margin safety and risk management to avoid liquidation.",
   alternates: { canonical: "/academy" },
+  openGraph: { url: "/academy", images: defaultOgImages },
 };
 
 const icons = {
