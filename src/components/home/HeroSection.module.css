@@ -44,7 +44,7 @@
 
 @media (max-width: 48em) {
   .orbitWrap {
-    width: min(78vw, 340px);
+    width: min(64vw, 260px);
   }
 }
 

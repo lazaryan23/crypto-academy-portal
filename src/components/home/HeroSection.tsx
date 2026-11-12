@@ -28,7 +28,7 @@ export function HeroSection() {
   return (
     <section className={classes.hero} aria-labelledby="hero-title">
       <Grid gap={{ base: 32, md: 48 }} align="center">
-        <GridCol span={{ base: 12, md: 7 }} order={{ base: 2, md: 1 }}>
+        <GridCol span={{ base: 12, md: 7 }} order={{ base: 1, md: 1 }}>
           <m.div variants={container} initial="hidden" animate="show">
             <Stack gap="lg">
               <m.div variants={item}>
@@ -100,7 +100,7 @@ export function HeroSection() {
           </m.div>
         </GridCol>
 
-        <GridCol span={{ base: 12, md: 5 }} order={{ base: 1, md: 2 }}>
+        <GridCol span={{ base: 12, md: 5 }} order={{ base: 2, md: 2 }}>
           <m.div
             initial={{ opacity: 0, scale: 0.85, rotate: -20 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
