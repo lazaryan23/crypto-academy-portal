@@ -27,6 +27,25 @@ export class CoinGeckoError extends Error {
   }
 }
 
+const excludedCoinIds = new Set([
+  "figure-heloc",
+  "staked-ether",
+  "wrapped-steth",
+  "wrapped-bitcoin",
+  "weth",
+  "wrapped-eeth",
+  "coinbase-wrapped-btc",
+  "binance-peg-weth",
+  "binance-bridged-usdt-bnb-smart-chain",
+  "blackrock-usd-institutional-digital-liquidity-fund",
+  "ondo-us-dollar-yield",
+  "usdtb",
+]);
+
+export function isListedCoin(coin: Pick<CoinMarket, "id" | "symbol">): boolean {
+  return !excludedCoinIds.has(coin.id) && !coin.symbol.includes("_");
+}
+
 type Result<T> = { ok: true; data: T } | { ok: false; status: number };
 
 const failureCacheLife = { stale: 0, revalidate: 15, expire: 60 };
@@ -78,10 +97,11 @@ async function fetchMarkets({ category = "top", ids, perPage = 50, page = 1 }: M
     return { ok: true, data: rows.data.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)) };
   }
 
+  const topLimit = category === "top" && !ids ? Math.min(perPage, 10) : null;
   const params: Record<string, string | number | boolean> = {
     vs_currency: "usd",
     order: "market_cap_desc",
-    per_page: category === "top" && !ids ? Math.min(perPage, 10) : perPage,
+    per_page: topLimit ? topLimit + 10 : perPage,
     page,
     sparkline: true,
     price_change_percentage: "1h,24h,7d",
@@ -89,7 +109,10 @@ async function fetchMarkets({ category = "top", ids, perPage = 50, page = 1 }: M
   if (ids?.length) params.ids = ids.join(",");
   if (category !== "top" && category !== "trending") params.category = categoryApiIds[category];
 
-  return request<CoinMarket[]>("/coins/markets", params);
+  const result = await request<CoinMarket[]>("/coins/markets", params);
+  if (!result.ok || ids) return result;
+  const listed = result.data.filter(isListedCoin);
+  return { ok: true, data: topLimit ? listed.slice(0, topLimit) : listed };
 }
 
 function fetchTrending(): Promise<Result<TrendingResponse>> {
@@ -154,4 +177,17 @@ async function cachedSearch(query: string): Promise<Result<SearchResponse>> {
 
 export async function searchCoins(query: string): Promise<SearchResponse> {
   return unwrap(await cachedSearch(query));
+}
+
+async function cachedTopCoinIds(limit: number): Promise<Result<string[]>> {
+  "use cache";
+  const result = await request<CoinMarket[]>("/coins/markets", { vs_currency: "usd", order: "market_cap_desc", per_page: limit, page: 1 });
+  if (result.ok) cacheLife("days");
+  else cacheLife(failureCacheLife);
+  return result.ok ? { ok: true, data: result.data.filter(isListedCoin).map((c) => c.id) } : result;
+}
+
+export async function getTopCoinIds(limit = 100): Promise<string[]> {
+  const result = await cachedTopCoinIds(limit);
+  return result.ok ? result.data : [];
 }
