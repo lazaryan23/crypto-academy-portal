@@ -87,18 +87,23 @@ export async function getTrending(): Promise<TrendingResponse> {
   return request<TrendingResponse>("/search/trending");
 }
 
-export async function getCoin(id: string): Promise<CoinDetail> {
+export async function getCoin(id: string): Promise<CoinDetail | null> {
   "use cache";
   cacheLife({ stale: 60, revalidate: 120, expire: 86400 });
   cacheTag(`coin:${id}`);
-  return request<CoinDetail>(`/coins/${encodeURIComponent(id)}`, {
-    localization: false,
-    tickers: false,
-    market_data: true,
-    community_data: false,
-    developer_data: false,
-    sparkline: false,
-  });
+  try {
+    return await request<CoinDetail>(`/coins/${encodeURIComponent(id)}`, {
+      localization: false,
+      tickers: false,
+      market_data: true,
+      community_data: false,
+      developer_data: false,
+      sparkline: false,
+    });
+  } catch (error) {
+    if (getErrorStatus(error) === 404) return null;
+    throw error;
+  }
 }
 
 export async function getMarketChart(id: string, days: ChartRange): Promise<MarketChart> {

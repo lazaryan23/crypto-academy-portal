@@ -3,7 +3,7 @@ import { AnchorLink } from "@/components/common/Links";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar, Badge, Breadcrumbs, Container, Group, Stack, Text, Title } from "@mantine/core";
-import { getCoin, getErrorStatus } from "@/lib/coingecko";
+import { getCoin } from "@/lib/coingecko";
 import { coinProfiles } from "@/content/coin-profiles";
 import { formatPrice } from "@/lib/format";
 import { siteConfig } from "@/config/site";
@@ -22,18 +22,16 @@ export function generateStaticParams() {
 }
 
 async function loadCoin(id: string) {
-  try {
-    return await getCoin(id);
-  } catch (error) {
-    if (getErrorStatus(error) === 404) notFound();
-    throw error;
-  }
+  const coin = await getCoin(id);
+  if (!coin) notFound();
+  return coin;
 }
 
 export async function generateMetadata({ params }: PageProps<"/crypto/[id]">): Promise<Metadata> {
   const { id } = await params;
   try {
     const coin = await getCoin(id);
+    if (!coin) return { title: "Coin not found", robots: { index: false } };
     const symbol = coin.symbol.toUpperCase();
     const price = formatPrice(coin.market_data.current_price.usd);
     const title = `${coin.name} (${symbol}) Price Today, Live Chart & Market Cap`;
