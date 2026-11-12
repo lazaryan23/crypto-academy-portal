@@ -14,23 +14,27 @@ const ranges: { value: ChartRange; label: string }[] = [
   { value: "365", label: "1Y" },
 ];
 
-export function PriceChart({ coinId }: { coinId: string }) {
+const initialRange: ChartRange = "1";
+
+export function PriceChart({ coinId, initialPoints }: { coinId: string; initialPoints: ChartPoint[] | null }) {
   const container = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
   const series = useRef<ISeriesApi<"Area"> | null>(null);
   const scheme = useComputedColorScheme("dark", { getInitialValueInEffect: true });
-  const [range, setRange] = useState<ChartRange>("30");
+  const [range, setRange] = useState<ChartRange>(initialRange);
   const key = `${coinId}:${range}`;
-  const [result, setResult] = useState<{ key: string; points: ChartPoint[] | null; error: string | null }>({
-    key: "",
-    points: null,
+  const [result, setResult] = useState<{ key: string; points: ChartPoint[] | null; error: string | null }>(() => ({
+    key: initialPoints ? `${coinId}:${initialRange}` : "",
+    points: initialPoints,
     error: null,
-  });
+  }));
+  const hasData = result.key === key;
   const loading = result.key !== key;
   const points = result.points;
   const error = loading ? null : result.error;
 
   useEffect(() => {
+    if (hasData) return;
     const controller = new AbortController();
     fetch(`/api/chart/${encodeURIComponent(coinId)}?days=${range}`, { signal: controller.signal })
       .then(async (res) => {
@@ -42,7 +46,7 @@ export function PriceChart({ coinId }: { coinId: string }) {
         if (err.name !== "AbortError") setResult((prev) => ({ key, points: prev.points, error: err.message }));
       });
     return () => controller.abort();
-  }, [coinId, range, key]);
+  }, [coinId, range, key, hasData]);
 
   useEffect(() => {
     if (!container.current) return;

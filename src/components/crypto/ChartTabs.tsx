@@ -4,8 +4,17 @@ import { Paper, Tabs, TabsList, TabsPanel, TabsTab } from "@mantine/core";
 import { IconChartArea, IconChartCandle } from "@tabler/icons-react";
 import { PriceChart } from "./PriceChart";
 import { TradingViewWidget } from "./TradingViewWidget";
+import type { ChartPoint } from "@/types/coingecko";
 
-export function ChartTabs({ coinId, tradingViewSymbol }: { coinId: string; tradingViewSymbol: string }) {
+export function ChartTabs({
+  coinId,
+  tradingViewSymbol,
+  initialPoints,
+}: {
+  coinId: string;
+  tradingViewSymbol: string;
+  initialPoints: ChartPoint[] | null;
+}) {
   return (
     <Paper withBorder p={{ base: "sm", sm: "md" }}>
       <Tabs defaultValue="price" keepMounted={false}>
@@ -18,7 +27,7 @@ export function ChartTabs({ coinId, tradingViewSymbol }: { coinId: string; tradi
           </TabsTab>
         </TabsList>
         <TabsPanel value="price">
-          <PriceChart coinId={coinId} />
+          <PriceChart coinId={coinId} initialPoints={initialPoints} />
         </TabsPanel>
         <TabsPanel value="tradingview">
           <TradingViewWidget symbol={tradingViewSymbol} />

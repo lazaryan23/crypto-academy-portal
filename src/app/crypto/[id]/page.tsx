@@ -3,8 +3,8 @@ import { AnchorLink } from "@/components/common/Links";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar, Badge, Breadcrumbs, Container, Group, Stack, Text, Title } from "@mantine/core";
-import { getCoin } from "@/lib/coingecko";
-import { coinProfiles } from "@/content/coin-profiles";
+import { getCoin, getMarketChart } from "@/lib/coingecko";
+import { coinProfiles, popularCoinIds } from "@/content/coin-profiles";
 import { formatPrice } from "@/lib/format";
 import { siteConfig } from "@/config/site";
 import { PercentChange } from "@/components/common/PercentChange";
@@ -15,10 +15,8 @@ import { CoinAbout } from "@/components/crypto/CoinAbout";
 import { WhereToBuy } from "@/components/crypto/WhereToBuy";
 import { CoinDetailSkeleton } from "@/components/crypto/CoinDetailSkeleton";
 
-const prerenderedIds = ["bitcoin", "ethereum", "solana", "the-open-network"];
-
 export function generateStaticParams() {
-  return prerenderedIds.map((id) => ({ id }));
+  return popularCoinIds.map((id) => ({ id }));
 }
 
 async function loadCoin(id: string) {
@@ -50,6 +48,9 @@ export async function generateMetadata({ params }: PageProps<"/crypto/[id]">): P
 async function CoinDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const coin = await loadCoin(id);
+  const initialPoints = await getMarketChart(coin.id, "1")
+    .then((chart) => chart.prices)
+    .catch(() => null);
   const symbol = coin.symbol.toUpperCase();
   const tvSymbol = `BINANCE:${coinProfiles[coin.id]?.tradingSymbol ?? symbol}USDT`;
   const m = coin.market_data;
@@ -106,7 +107,7 @@ async function CoinDetails({ params }: { params: Promise<{ id: string }> }) {
         </Stack>
       </Group>
 
-      <ChartTabs coinId={coin.id} tradingViewSymbol={tvSymbol} />
+      <ChartTabs coinId={coin.id} tradingViewSymbol={tvSymbol} initialPoints={initialPoints} />
       <CoinStats coin={coin} />
       <WhereToBuy name={coin.name} symbol={coin.symbol} />
       <CoinAbout coin={coin} />
