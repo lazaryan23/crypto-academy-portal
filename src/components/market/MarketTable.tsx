@@ -7,9 +7,16 @@ import type { CoinMarket } from "@/types/coingecko";
 import { formatCompactUsd, formatPrice } from "@/lib/format";
 import { PercentChange } from "@/components/common/PercentChange";
 import { Sparkline } from "@/components/common/Sparkline";
+import { WatchlistButton } from "@/components/common/WatchlistButton";
 import classes from "./MarketTable.module.css";
 
-export function MarketTable({ coins }: { coins: CoinMarket[] }) {
+export function MarketTable({
+  coins,
+  rankOf = (coin) => coin.market_cap_rank,
+}: {
+  coins: CoinMarket[];
+  rankOf?: (coin: CoinMarket) => number | null;
+}) {
   const router = useRouter();
 
   return (
@@ -17,7 +24,12 @@ export function MarketTable({ coins }: { coins: CoinMarket[] }) {
       <Table verticalSpacing="sm" horizontalSpacing="md">
         <TableThead>
           <TableTr>
-            <TableTh w={48}>#</TableTh>
+            <TableTh w={40} px={0}>
+              <span className={classes.srOnly}>Watchlist</span>
+            </TableTh>
+            <TableTh w={40} pl={0}>
+              #
+            </TableTh>
             <TableTh>Name</TableTh>
             <TableTh ta="right">Price</TableTh>
             <TableTh ta="right">24h</TableTh>
@@ -42,9 +54,12 @@ export function MarketTable({ coins }: { coins: CoinMarket[] }) {
               onClick={() => router.push(`/crypto/${coin.id}`)}
               className={classes.row}
             >
-              <TableTd>
+              <TableTd px={0}>
+                <WatchlistButton coinId={coin.id} coinName={coin.name} size="sm" />
+              </TableTd>
+              <TableTd pl={0}>
                 <Text size="sm" c="dimmed">
-                  {coin.market_cap_rank ?? "—"}
+                  {rankOf(coin) ?? "—"}
                 </Text>
               </TableTd>
               <TableTd>

@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Badge, Group, Paper, ScrollArea, SegmentedControl, Stack, Text, TextInput } from "@mantine/core";
+import { Alert, Badge, Center, Group, Paper, ScrollArea, SegmentedControl, Stack, Text, TextInput } from "@mantine/core";
 import { useInterval } from "@mantine/hooks";
-import { IconAlertCircle, IconSearch } from "@tabler/icons-react";
+import { IconAlertCircle, IconSearch, IconStar, IconStarFilled } from "@tabler/icons-react";
 import type { CoinMarket, MarketCategory } from "@/types/coingecko";
+import { useWatchlist } from "@/lib/watchlist";
 import { MarketTable } from "./MarketTable";
 import { MarketTableSkeleton } from "./MarketTableSkeleton";
 
 const REFRESH_MS = 60_000;
+
+type DashboardTab = MarketCategory | "watchlist";
 
 export const marketCategories: { value: MarketCategory; label: string }[] = [
   { value: "top", label: "Top 10" },
@@ -20,21 +23,32 @@ export const marketCategories: { value: MarketCategory; label: string }[] = [
 
 type CacheEntry = { data: CoinMarket[]; updatedAt: number | null };
 
+function urlFor(tab: DashboardTab, ids: string[]) {
+  return tab === "watchlist" ? `/api/markets?ids=${[...ids].sort().join(",")}` : `/api/markets?category=${tab}`;
+}
+
 export function MarketDashboard({ initialData }: { initialData: CoinMarket[] | null }) {
-  const [category, setCategory] = useState<MarketCategory>("top");
+  const { ids: watchlist } = useWatchlist();
+  const watchlistRef = useRef(watchlist);
+  const [tab, setTab] = useState<DashboardTab>("top");
   const [query, setQuery] = useState("");
-  const [cache, setCache] = useState<Partial<Record<MarketCategory, CacheEntry>>>(() =>
+  const [cache, setCache] = useState<Partial<Record<DashboardTab, CacheEntry>>>(() =>
     initialData ? { top: { data: initialData, updatedAt: null } } : {},
   );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(!initialData);
   const inflight = useRef<AbortController | null>(null);
 
-  const fetchCategory = useCallback((target: MarketCategory) => {
+  const fetchTab = useCallback((target: DashboardTab) => {
     inflight.current?.abort();
+    if (target === "watchlist" && watchlistRef.current.length === 0) {
+      setCache((prev) => ({ ...prev, watchlist: { data: [], updatedAt: Date.now() } }));
+      setLoading(false);
+      return Promise.resolve();
+    }
     const controller = new AbortController();
     inflight.current = controller;
-    return fetch(`/api/markets?category=${target}`, { signal: controller.signal })
+    return fetch(urlFor(target, watchlistRef.current), { signal: controller.signal })
       .then(async (res) => {
         const body = await res.json();
         if (!res.ok) throw new Error(body?.error ?? "Failed to load market data.");
@@ -50,51 +64,77 @@ export function MarketDashboard({ initialData }: { initialData: CoinMarket[] | n
   }, []);
 
   const refresh = useCallback(
-    (target: MarketCategory) => {
+    (target: DashboardTab) => {
       setLoading(true);
-      void fetchCategory(target);
+      void fetchTab(target);
     },
-    [fetchCategory],
+    [fetchTab],
   );
 
   useEffect(() => {
-    if (!initialData) void fetchCategory("top");
+    if (!initialData) void fetchTab("top");
     return () => inflight.current?.abort();
-  }, [initialData, fetchCategory]);
+  }, [initialData, fetchTab]);
+
+  const watchlistData = cache.watchlist?.data;
+  useEffect(() => {
+    watchlistRef.current = watchlist;
+    if (tab !== "watchlist" || watchlist.length === 0) return;
+    const loaded = new Set(watchlistData?.map((coin) => coin.id));
+    if (!watchlistData || watchlist.some((id) => !loaded.has(id))) void fetchTab("watchlist");
+  }, [watchlist, tab, watchlistData, fetchTab]);
 
   useInterval(
     () => {
-      if (document.visibilityState === "visible") refresh(category);
+      if (document.visibilityState === "visible") refresh(tab);
     },
     REFRESH_MS,
     { autoInvoke: true },
   );
 
-  const changeCategory = (next: MarketCategory) => {
-    setCategory(next);
+  const changeTab = (next: DashboardTab) => {
+    setTab(next);
+    setError(null);
+    if (next === "watchlist") return;
     const cached = cache[next];
     if (!cached || (cached.updatedAt !== null && Date.now() - cached.updatedAt > REFRESH_MS)) refresh(next);
   };
 
-  const entry = cache[category];
+  const entry = cache[tab];
+
+  const positions = useMemo(() => new Map(entry?.data.map((coin, index) => [coin.id, index + 1])), [entry]);
 
   const rows = useMemo(() => {
-    const data = entry?.data ?? [];
+    let data = entry?.data ?? [];
+    if (tab === "watchlist") {
+      const order = new Map(watchlist.map((id, i) => [id, i]));
+      data = data.filter((coin) => order.has(coin.id)).sort((a, b) => (a.market_cap_rank ?? Infinity) - (b.market_cap_rank ?? Infinity));
+    }
     const q = query.trim().toLowerCase();
     if (!q) return data;
     return data.filter((coin) => coin.name.toLowerCase().includes(q) || coin.symbol.toLowerCase().includes(q));
-  }, [entry, query]);
+  }, [entry, query, tab, watchlist]);
+
+  const tabs = [
+    {
+      value: "watchlist",
+      label: (
+        <Center style={{ gap: 6 }}>
+          {watchlist.length ? <IconStarFilled size={14} color="var(--mantine-color-yellow-5)" /> : <IconStar size={14} />}
+          <span>Watchlist{watchlist.length ? ` (${watchlist.length})` : ""}</span>
+        </Center>
+      ),
+    },
+    ...marketCategories,
+  ];
+
+  const showEmptyWatchlist = tab === "watchlist" && watchlist.length === 0;
 
   return (
     <Stack gap="md">
       <Group justify="space-between" gap="sm">
         <ScrollArea type="never" maw="100%">
-          <SegmentedControl
-            value={category}
-            onChange={(value) => changeCategory(value as MarketCategory)}
-            data={marketCategories}
-            aria-label="Market category"
-          />
+          <SegmentedControl value={tab} onChange={(value) => changeTab(value as DashboardTab)} data={tabs} aria-label="Market category" />
         </ScrollArea>
         <Group gap="sm" wrap="nowrap" style={{ flex: "1 1 240px" }} justify="flex-end">
           <TextInput
@@ -118,18 +158,26 @@ export function MarketDashboard({ initialData }: { initialData: CoinMarket[] | n
       )}
 
       <Paper withBorder>
-        {!entry ? (
+        {showEmptyWatchlist ? (
+          <Stack align="center" gap={6} p="xl">
+            <IconStar size={28} color="var(--mantine-color-yellow-5)" />
+            <Text fw={600}>Your watchlist is empty</Text>
+            <Text size="sm" c="dimmed" ta="center" maw={420}>
+              Tap the star next to any coin, here or on its page, to follow it. Your watchlist is saved in this browser — no account needed.
+            </Text>
+          </Stack>
+        ) : !entry ? (
           <MarketTableSkeleton />
         ) : rows.length === 0 ? (
           <Text p="xl" ta="center" c="dimmed">
             No coins match “{query}”. Try the search in the header to look up any coin.
           </Text>
         ) : (
-          <MarketTable coins={rows} />
+          <MarketTable coins={rows} rankOf={tab === "top" ? (coin) => positions.get(coin.id) ?? null : undefined} />
         )}
       </Paper>
 
-      {entry && (
+      {entry && !showEmptyWatchlist && (
         <Text size="xs" c="dimmed" ta="right">
           {entry.updatedAt ? `Updated ${new Date(entry.updatedAt).toLocaleTimeString()}` : "Server snapshot"} · auto-refreshes every minute
         </Text>
