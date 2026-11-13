@@ -28,7 +28,7 @@ import { GlobalSpotlight, type SpotlightIndex } from "./GlobalSpotlight";
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/" || pathname.startsWith("/crypto");
-  if (href === "/derivatives") return pathname.startsWith("/derivatives") || pathname.startsWith("/liquidations");
+  if (href === "/derivatives") return ["/derivatives", "/liquidations", "/options"].some((prefix) => pathname.startsWith(prefix));
   return pathname.startsWith(href);
 }
 
