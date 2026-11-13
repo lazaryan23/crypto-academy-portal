@@ -77,6 +77,7 @@ const spotlightIndex: SpotlightIndex = {
   pages: [
     { label: "Markets", href: "/", description: "Live prices, watchlist and top movers" },
     { label: "Academy", href: "/academy", description: "Guides on futures, leverage and risk" },
+    { label: "Crypto news", href: "/news", description: "Latest headlines from top publishers" },
     { label: "Investing guide", href: "/investing-guide", description: "Long-term allocation and DCA" },
     { label: "Compare coins", href: "/compare", description: "Two coins on one chart" },
     { label: "DCA calculator", href: "/tools/dca", description: "Backtest weekly or monthly buys" },

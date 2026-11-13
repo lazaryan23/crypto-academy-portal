@@ -22,6 +22,7 @@ export const siteConfig = {
     { label: "Markets", href: "/" },
     { label: "Academy", href: "/academy" },
     { label: "Investing Guide", href: "/investing-guide" },
+    { label: "News", href: "/news" },
   ],
   tools: [
     { label: "Compare coins", href: "/compare" },
