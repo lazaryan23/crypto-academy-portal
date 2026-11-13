@@ -11,6 +11,8 @@ import { PercentChange } from "@/components/common/PercentChange";
 import { Disclaimer } from "@/components/common/Disclaimer";
 import { CoinTradeWorkspace } from "@/components/crypto/CoinTradeWorkspace";
 import { WatchlistButton } from "@/components/common/WatchlistButton";
+import { DerivativesCard, DerivativesCardSkeleton } from "@/components/crypto/DerivativesCard";
+import { CompareLinks } from "@/components/crypto/CompareLinks";
 import { CoinStats } from "@/components/crypto/CoinStats";
 import { CoinAbout } from "@/components/crypto/CoinAbout";
 import { WhereToBuy } from "@/components/crypto/WhereToBuy";
@@ -117,9 +119,13 @@ async function CoinDetails({ params }: { params: Promise<{ id: string }> }) {
         tradingViewSymbol={tvSymbol}
         initialPoints={initialPoints}
       />
+      <Suspense fallback={<DerivativesCardSkeleton />}>
+        <DerivativesCard symbol={coinProfiles[coin.id]?.tradingSymbol ?? coin.symbol} name={coin.name} />
+      </Suspense>
       <CoinStats coin={coin} />
       <WhereToBuy name={coin.name} symbol={coin.symbol} />
       <CoinAbout coin={coin} />
+      <CompareLinks coinId={coin.id} name={coin.name} />
       <Disclaimer />
     </Stack>
   );

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { defaultOgImages } from "@/config/site";
 import { Suspense } from "react";
-import { Badge, Card, Container, SimpleGrid, Skeleton, Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import { IconCircleCheck } from "@tabler/icons-react";
+import { Badge, Card, Container, Group, SimpleGrid, Skeleton, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import { IconArrowsLeftRight, IconCalculator, IconCircleCheck } from "@tabler/icons-react";
+import { CardLink } from "@/components/common/Links";
 import { investingPrinciples } from "@/content/investing";
 import { exchangeList } from "@/config/affiliates";
 import { AllocationPlanner } from "@/components/investing/AllocationPlanner";
@@ -88,6 +89,34 @@ export default function InvestingGuidePage() {
                 </Text>
               </Card>
             ))}
+          </SimpleGrid>
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            <CardLink href="/tools/dca" withBorder padding="lg">
+              <Group gap="sm" wrap="nowrap">
+                <ThemeIcon variant="light" size={40} radius="md" color="cyan">
+                  <IconCalculator size={22} />
+                </ThemeIcon>
+                <Stack gap={2}>
+                  <Text fw={700}>Backtest a DCA plan</Text>
+                  <Text size="sm" c="dimmed">
+                    See what weekly or monthly buys over the last year would be worth today.
+                  </Text>
+                </Stack>
+              </Group>
+            </CardLink>
+            <CardLink href="/compare" withBorder padding="lg">
+              <Group gap="sm" wrap="nowrap">
+                <ThemeIcon variant="light" size={40} radius="md" color="violet">
+                  <IconArrowsLeftRight size={22} />
+                </ThemeIcon>
+                <Stack gap={2}>
+                  <Text fw={700}>Compare two coins</Text>
+                  <Text size="sm" c="dimmed">
+                    Put any two cryptos on one chart and compare their size, supply and returns.
+                  </Text>
+                </Stack>
+              </Group>
+            </CardLink>
           </SimpleGrid>
         </Stack>
 

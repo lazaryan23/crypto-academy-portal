@@ -2,11 +2,17 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from "@mantine/core";
 import "@mantine/core/styles.css";
+import "@mantine/spotlight/styles.css";
 import "./globals.css";
 import { theme } from "@/theme";
 import { siteConfig } from "@/config/site";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { MarketPulse, MarketPulseSkeleton } from "@/components/layout/MarketPulse";
+import { Suspense } from "react";
+import type { SpotlightIndex } from "@/components/layout/GlobalSpotlight";
+import { guides } from "@/content/academy";
+import { pairCoinNames, pairSlug, popularPairs } from "@/lib/pairs";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
@@ -67,6 +73,18 @@ const siteJsonLd = [
   },
 ];
 
+const spotlightIndex: SpotlightIndex = {
+  pages: [
+    { label: "Markets", href: "/", description: "Live prices, watchlist and top movers" },
+    { label: "Academy", href: "/academy", description: "Guides on futures, leverage and risk" },
+    { label: "Investing guide", href: "/investing-guide", description: "Long-term allocation and DCA" },
+    { label: "Compare coins", href: "/compare", description: "Two coins on one chart" },
+    { label: "DCA calculator", href: "/tools/dca", description: "Backtest weekly or monthly buys" },
+  ],
+  guides: guides.map((guide) => ({ label: guide.shortTitle, href: `/academy/${guide.slug}`, description: guide.level })),
+  pairs: popularPairs.map(([a, b]) => ({ label: `${pairCoinNames[a] ?? a} vs ${pairCoinNames[b] ?? b}`, href: `/compare/${pairSlug(a, b)}` })),
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`} {...mantineHtmlProps}>
@@ -77,7 +95,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd).replace(/</g, "\\u003c") }} />
         <MantineProvider theme={theme} defaultColorScheme="dark">
           <MotionProvider>
-            <SiteShell footer={<SiteFooter />}>{children}</SiteShell>
+            <SiteShell
+              footer={<SiteFooter />}
+              spotlightIndex={spotlightIndex}
+              pulse={
+                <Suspense fallback={<MarketPulseSkeleton />}>
+                  <MarketPulse />
+                </Suspense>
+              }
+            >
+              {children}
+            </SiteShell>
           </MotionProvider>
         </MantineProvider>
       </body>

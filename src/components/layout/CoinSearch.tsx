@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Avatar, Group, Loader, Select, Stack, Text } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
+import { Avatar, Group, Kbd, Loader, Select, Stack, Text, UnstyledButton } from "@mantine/core";
+import { useDebouncedValue, useOs } from "@mantine/hooks";
+import { spotlight } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import type { CoinMarket, SearchCoin } from "@/types/coingecko";
 import { formatPrice } from "@/lib/format";
 import { PercentChange } from "@/components/common/PercentChange";
+import { loadTopCoins } from "@/lib/top-coins";
 
 interface OptionMeta {
   image: string;
@@ -17,19 +19,9 @@ interface OptionMeta {
   change?: number | null;
 }
 
-let topCoinsRequest: Promise<CoinMarket[]> | null = null;
-
-function loadTopCoins(): Promise<CoinMarket[]> {
-  topCoinsRequest ??= fetch("/api/markets?category=top")
-    .then((res) => (res.ok ? (res.json() as Promise<CoinMarket[]>) : Promise.reject(new Error(String(res.status)))))
-    .catch((err) => {
-      topCoinsRequest = null;
-      throw err;
-    });
-  return topCoinsRequest;
-}
-
-export function CoinSearch({ onNavigate }: { onNavigate?: () => void }) {
+export function CoinSearch({ onNavigate, shortcutHint }: { onNavigate?: () => void; shortcutHint?: boolean }) {
+  const os = useOs();
+  const modKey = os === "macos" || os === "ios" ? "⌘" : "Ctrl";
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search, 300);
@@ -113,7 +105,22 @@ export function CoinSearch({ onNavigate }: { onNavigate?: () => void }) {
       placeholder="Search coins…"
       aria-label="Search cryptocurrencies"
       leftSection={<IconSearch size={16} />}
-      rightSection={loading || topStatus === "loading" ? <Loader size={14} /> : null}
+      rightSection={
+        loading || topStatus === "loading" ? (
+          <Loader size={14} />
+        ) : shortcutHint && os !== "undetermined" && !search ? (
+          <UnstyledButton
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => spotlight.open()}
+            aria-label="Open quick search"
+            visibleFrom="md"
+          >
+            <Kbd size="xs">{modKey} K</Kbd>
+          </UnstyledButton>
+        ) : null
+      }
+      rightSectionWidth={shortcutHint ? 60 : undefined}
+      rightSectionPointerEvents="all"
       data={data}
       filter={({ options }) => options}
       nothingFoundMessage={nothingFound}

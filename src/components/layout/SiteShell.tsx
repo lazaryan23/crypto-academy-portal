@@ -24,6 +24,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconCompass, IconMoon, IconSun } from "@tabler/icons-react";
 import { siteConfig } from "@/config/site";
 import { CoinSearch } from "./CoinSearch";
+import { GlobalSpotlight, type SpotlightIndex } from "./GlobalSpotlight";
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" || pathname.startsWith("/crypto") : pathname.startsWith(href);
@@ -49,7 +50,17 @@ function ColorSchemeToggle() {
   );
 }
 
-export function SiteShell({ children, footer }: { children: ReactNode; footer: ReactNode }) {
+export function SiteShell({
+  children,
+  footer,
+  pulse,
+  spotlightIndex,
+}: {
+  children: ReactNode;
+  footer: ReactNode;
+  pulse: ReactNode;
+  spotlightIndex: SpotlightIndex;
+}) {
   const [opened, { toggle, close }] = useDisclosure(false);
   const pathname = usePathname();
 
@@ -90,7 +101,7 @@ export function SiteShell({ children, footer }: { children: ReactNode; footer: R
 
             <Group gap="xs" wrap="nowrap">
               <Box visibleFrom="xs" w={{ xs: 260, lg: 320 }}>
-                <CoinSearch />
+                <CoinSearch shortcutHint />
               </Box>
               <ColorSchemeToggle />
             </Group>
@@ -103,7 +114,7 @@ export function SiteShell({ children, footer }: { children: ReactNode; footer: R
           <Box hiddenFrom="xs">
             <CoinSearch onNavigate={close} />
           </Box>
-          {siteConfig.nav.map((item) => (
+          {[...siteConfig.nav, ...siteConfig.tools].map((item) => (
             <NavLink
               key={item.href}
               component={Link}
@@ -116,8 +127,10 @@ export function SiteShell({ children, footer }: { children: ReactNode; footer: R
         </Stack>
       </AppShellNavbar>
 
+      <GlobalSpotlight index={spotlightIndex} />
       <AppShellMain>
-        <Box mih="calc(100dvh - 64px)">{children}</Box>
+        {pulse}
+        <Box mih="calc(100dvh - 100px)">{children}</Box>
         {footer}
       </AppShellMain>
     </AppShell>
