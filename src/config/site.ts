@@ -29,6 +29,7 @@ export const siteConfig = {
     { label: "Compare coins", href: "/compare" },
     { label: "DCA calculator", href: "/tools/dca" },
     { label: "Profit calculator", href: "/tools/calculator" },
+    { label: "Gas & converter", href: "/tools/gas-converter" },
   ],
 };
 

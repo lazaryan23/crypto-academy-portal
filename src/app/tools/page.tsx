@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Badge, Container, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import { IconArrowsLeftRight, IconCalculator, IconChartLine } from "@tabler/icons-react";
+import { IconArrowsLeftRight, IconCalculator, IconChartLine, IconGasStation } from "@tabler/icons-react";
 import { CardLink } from "@/components/common/Links";
 import { defaultOgImages } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: "Free Crypto Tools — Profit Calculator, DCA Backtester & Coin Comparison",
-  description: "Free crypto tools: calculate trade profit and ROI after fees, backtest dollar-cost averaging, and compare any two coins side by side.",
+  title: "Free Crypto Tools — Profit Calculator, DCA Backtester, Gas Tracker & More",
+  description: "Free crypto tools: trade profit and ROI after fees, DCA backtesting, live Bitcoin and Ethereum fees, a crypto converter, and side-by-side coin comparison.",
   alternates: { canonical: "/tools" },
   openGraph: { url: "/tools", images: defaultOgImages },
 };
@@ -25,6 +25,13 @@ const tools = [
     text: "See what weekly or monthly buys over the last year would be worth today, compared with investing it all at once.",
     icon: IconChartLine,
     color: "cyan",
+  },
+  {
+    href: "/tools/gas-converter",
+    title: "Gas tracker & converter",
+    text: "Live Bitcoin fees and Ethereum gas with the dollar cost of a transfer or swap, plus a crypto-to-fiat converter.",
+    icon: IconGasStation,
+    color: "orange",
   },
   {
     href: "/compare",

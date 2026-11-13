@@ -83,6 +83,7 @@ const spotlightIndex: SpotlightIndex = {
     { label: "Compare coins", href: "/compare", description: "Two coins on one chart" },
     { label: "DCA calculator", href: "/tools/dca", description: "Backtest weekly or monthly buys" },
     { label: "Profit & tax calculator", href: "/tools/calculator", description: "Profit, loss and ROI after fees" },
+    { label: "Gas tracker & converter", href: "/tools/gas-converter", description: "Live BTC fees, ETH gas and fiat conversion" },
     { label: "All tools", href: "/tools", description: "Calculators and comparisons" },
   ],
   guides: guides.map((guide) => ({ label: guide.shortTitle, href: `/academy/${guide.slug}`, description: guide.level })),
