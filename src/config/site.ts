@@ -22,6 +22,7 @@ export const siteConfig = {
     { label: "Markets", href: "/" },
     { label: "Academy", href: "/academy" },
     { label: "Investing Guide", href: "/investing-guide" },
+    { label: "Heatmap", href: "/heatmap" },
     { label: "News", href: "/news" },
   ],
   tools: [
