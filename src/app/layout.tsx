@@ -80,6 +80,8 @@ const spotlightIndex: SpotlightIndex = {
     { label: "Investing guide", href: "/investing-guide", description: "Long-term allocation and DCA" },
     { label: "Compare coins", href: "/compare", description: "Two coins on one chart" },
     { label: "DCA calculator", href: "/tools/dca", description: "Backtest weekly or monthly buys" },
+    { label: "Profit & tax calculator", href: "/tools/calculator", description: "Profit, loss and ROI after fees" },
+    { label: "All tools", href: "/tools", description: "Calculators and comparisons" },
   ],
   guides: guides.map((guide) => ({ label: guide.shortTitle, href: `/academy/${guide.slug}`, description: guide.level })),
   pairs: popularPairs.map(([a, b]) => ({ label: `${pairCoinNames[a] ?? a} vs ${pairCoinNames[b] ?? b}`, href: `/compare/${pairSlug(a, b)}` })),
