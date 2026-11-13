@@ -67,14 +67,14 @@ export function SiteShell({
   return (
     <AppShell
       header={{ height: 64 }}
-      navbar={{ width: 280, breakpoint: "md", collapsed: { desktop: true, mobile: !opened } }}
+      navbar={{ width: 280, breakpoint: "lg", collapsed: { desktop: true, mobile: !opened } }}
       padding={0}
     >
       <AppShellHeader>
         <Container size="xl" h="100%">
           <Group h="100%" justify="space-between" wrap="nowrap" gap="md">
             <Group gap="xs" wrap="nowrap">
-              <Burger opened={opened} onClick={toggle} hiddenFrom="md" size="sm" aria-label="Toggle navigation" />
+              <Burger opened={opened} onClick={toggle} hiddenFrom="lg" size="sm" aria-label="Toggle navigation" />
               <Link href="/" onClick={close} style={{ textDecoration: "none" }} aria-label={`${siteConfig.name} home`}>
                 <Group gap={8} wrap="nowrap">
                   <IconCompass size={28} color="var(--mantine-color-brand-5)" />
@@ -85,7 +85,7 @@ export function SiteShell({
               </Link>
             </Group>
 
-            <Group gap={4} visibleFrom="md" wrap="nowrap" component="nav" aria-label="Main">
+            <Group gap={4} visibleFrom="lg" wrap="nowrap" component="nav" aria-label="Main">
               {siteConfig.nav.map((item) => (
                 <Button
                   key={item.href}
