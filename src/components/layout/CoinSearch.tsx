@@ -118,15 +118,20 @@ export function CoinSearch({ onNavigate }: { onNavigate?: () => void }) {
       filter={({ options }) => options}
       nothingFoundMessage={nothingFound}
       comboboxProps={{
-        width: 320,
-        position: "bottom-end",
+        width: "target",
+        position: "bottom",
         styles: {
           dropdown: {
+            padding: 4,
             maxHeight: "min(360px, 60dvh)",
             overflowY: "auto",
             overscrollBehavior: "contain",
           },
+          option: {
+            paddingInline: 11,
+          },
           groupLabel: {
+            paddingInline: 11,
             fontSize: "var(--mantine-font-size-xs)",
             fontWeight: 700,
             textTransform: "uppercase",
@@ -139,7 +144,7 @@ export function CoinSearch({ onNavigate }: { onNavigate?: () => void }) {
         const coin = meta.get(option.value);
         return (
           <Group gap="sm" wrap="nowrap" w="100%">
-            <Text size="xs" c="dimmed" w={32} ta="right" style={{ flexShrink: 0, whiteSpace: "nowrap" }}>
+            <Text size="xs" c="dimmed" miw={16} style={{ flexShrink: 0, whiteSpace: "nowrap" }}>
               {coin?.rank ?? ""}
             </Text>
             <Avatar src={coin?.image} size={22} alt="" />
