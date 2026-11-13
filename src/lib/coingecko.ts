@@ -58,12 +58,34 @@ async function request<T>(path: string, params: Record<string, string | number |
   const apiKey = process.env.COINGECKO_API_KEY;
   if (apiKey) headers["x-cg-demo-api-key"] = apiKey;
 
+  const key = url.toString();
+  let status: number;
   try {
     const res = await fetch(url, { headers, signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) return { ok: false, status: res.status };
-    return { ok: true, data: (await res.json()) as T };
+    if (res.ok) {
+      const data = (await res.json()) as T;
+      rememberResponse(key, data);
+      return { ok: true, data };
+    }
+    status = res.status;
   } catch {
-    return { ok: false, status: 503 };
+    status = 503;
+  }
+  const fallback = status === 429 || status >= 500 ? lastGoodResponses.get(key) : undefined;
+  if (fallback && Date.now() - fallback.at < LAST_GOOD_MAX_AGE_MS) return { ok: true, data: fallback.data as T };
+  return { ok: false, status };
+}
+
+const LAST_GOOD_MAX_AGE_MS = 6 * 3_600_000;
+const LAST_GOOD_LIMIT = 300;
+const lastGoodResponses = new Map<string, { at: number; data: unknown }>();
+
+function rememberResponse(key: string, data: unknown) {
+  lastGoodResponses.delete(key);
+  lastGoodResponses.set(key, { at: Date.now(), data });
+  if (lastGoodResponses.size > LAST_GOOD_LIMIT) {
+    const oldest = lastGoodResponses.keys().next().value;
+    if (oldest !== undefined) lastGoodResponses.delete(oldest);
   }
 }
 
