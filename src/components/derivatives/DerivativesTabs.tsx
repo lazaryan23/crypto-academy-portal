@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Button, Group } from "@mantine/core";
-import { IconFlame, IconPercentage } from "@tabler/icons-react";
+import { Box, Button, Group } from "@mantine/core";
+import { IconChartCandle, IconFlame, IconPercentage } from "@tabler/icons-react";
 
 const tabs = [
-  { href: "/derivatives", label: "Funding & open interest", icon: IconPercentage },
-  { href: "/liquidations", label: "Liquidations", icon: IconFlame },
+  { href: "/derivatives", label: "Funding & open interest", short: "Funding", icon: IconPercentage },
+  { href: "/liquidations", label: "Liquidations", short: "Liquidations", icon: IconFlame },
+  { href: "/options", label: "Options", short: "Options", icon: IconChartCandle },
 ] as const;
 
 export function DerivativesTabs({ active }: { active: (typeof tabs)[number]["href"] }) {
@@ -23,7 +24,12 @@ export function DerivativesTabs({ active }: { active: (typeof tabs)[number]["hre
           leftSection={<tab.icon size={14} />}
           aria-current={tab.href === active ? "page" : undefined}
         >
-          {tab.label}
+          <Box component="span" visibleFrom="xs">
+            {tab.label}
+          </Box>
+          <Box component="span" hiddenFrom="xs">
+            {tab.short}
+          </Box>
         </Button>
       ))}
     </Group>
