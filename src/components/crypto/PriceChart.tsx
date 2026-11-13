@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AreaSeries, ColorType, createChart, type IChartApi, type ISeriesApi, type UTCTimestamp } from "lightweight-charts";
+import {
+  AreaSeries,
+  ColorType,
+  createChart,
+  type AutoscaleInfo,
+  type IChartApi,
+  type ISeriesApi,
+  type LineStyle,
+  type UTCTimestamp,
+} from "lightweight-charts";
 import { Alert, Box, Group, LoadingOverlay, SegmentedControl, Text, useComputedColorScheme } from "@mantine/core";
 import type { ChartPoint, ChartRange } from "@/types/coingecko";
 import { formatPercent, formatPrice } from "@/lib/format";
@@ -15,11 +24,30 @@ const ranges: { value: ChartRange; label: string }[] = [
 ];
 
 const initialRange: ChartRange = "1";
+const solidLine = 0 as LineStyle;
+const dashedLine = 2 as LineStyle;
 
-export function PriceChart({ coinId, initialPoints }: { coinId: string; initialPoints: ChartPoint[] | null }) {
+export interface ChartLevel {
+  price: number;
+  title: string;
+  color: string;
+  dashed?: boolean;
+  fitToScale?: boolean;
+}
+
+export function PriceChart({
+  coinId,
+  initialPoints,
+  levels,
+}: {
+  coinId: string;
+  initialPoints: ChartPoint[] | null;
+  levels?: ChartLevel[];
+}) {
   const container = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
   const series = useRef<ISeriesApi<"Area"> | null>(null);
+  const levelsRef = useRef<ChartLevel[]>([]);
   const scheme = useComputedColorScheme("dark", { getInitialValueInEffect: true });
   const [range, setRange] = useState<ChartRange>(initialRange);
   const key = `${coinId}:${range}`;
@@ -60,7 +88,22 @@ export function PriceChart({ coinId, initialPoints }: { coinId: string; initialP
       localization: { priceFormatter: (price: number) => formatPrice(price) },
     });
     chart.current = instance;
-    series.current = instance.addSeries(AreaSeries, { lineWidth: 2, priceLineVisible: false });
+    series.current = instance.addSeries(AreaSeries, {
+      lineWidth: 2,
+      priceLineVisible: false,
+      autoscaleInfoProvider: (original: () => AutoscaleInfo | null) => {
+        const info = original();
+        const prices = levelsRef.current.filter((level) => level.fitToScale !== false).map((level) => level.price);
+        if (!info?.priceRange || prices.length === 0) return info;
+        return {
+          ...info,
+          priceRange: {
+            minValue: Math.min(info.priceRange.minValue, ...prices),
+            maxValue: Math.max(info.priceRange.maxValue, ...prices),
+          },
+        };
+      },
+    });
     return () => {
       instance.remove();
       chart.current = null;
@@ -78,6 +121,26 @@ export function PriceChart({ coinId, initialPoints }: { coinId: string; initialP
       },
     });
   }, [scheme]);
+
+  useEffect(() => {
+    const target = series.current;
+    levelsRef.current = levels ?? [];
+    if (!target || !levels?.length) return;
+    const lines = levels.map((level) =>
+      target.createPriceLine({
+        price: level.price,
+        color: level.color,
+        lineWidth: 2,
+        lineStyle: level.dashed ? dashedLine : solidLine,
+        axisLabelVisible: true,
+        title: level.title,
+      }),
+    );
+    return () => {
+      levelsRef.current = [];
+      lines.forEach((line) => target.removePriceLine(line));
+    };
+  }, [levels]);
 
   const first = points?.[0]?.[1];
   const last = points?.[points.length - 1]?.[1];

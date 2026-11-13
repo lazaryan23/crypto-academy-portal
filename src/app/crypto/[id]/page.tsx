@@ -9,7 +9,8 @@ import { formatPrice } from "@/lib/format";
 import { siteConfig } from "@/config/site";
 import { PercentChange } from "@/components/common/PercentChange";
 import { Disclaimer } from "@/components/common/Disclaimer";
-import { ChartTabs } from "@/components/crypto/ChartTabs";
+import { CoinTradeWorkspace } from "@/components/crypto/CoinTradeWorkspace";
+import { WatchlistButton } from "@/components/common/WatchlistButton";
 import { CoinStats } from "@/components/crypto/CoinStats";
 import { CoinAbout } from "@/components/crypto/CoinAbout";
 import { WhereToBuy } from "@/components/crypto/WhereToBuy";
@@ -88,6 +89,7 @@ async function CoinDetails({ params }: { params: Promise<{ id: string }> }) {
                 {symbol}
               </Badge>
               {coin.market_cap_rank && <Badge variant="light">Rank #{coin.market_cap_rank}</Badge>}
+              <WatchlistButton coinId={coin.id} coinName={coin.name} size="lg" />
             </Group>
             <Text c="dimmed" size="sm">
               {coin.name} price in USD
@@ -107,7 +109,14 @@ async function CoinDetails({ params }: { params: Promise<{ id: string }> }) {
         </Stack>
       </Group>
 
-      <ChartTabs coinId={coin.id} tradingViewSymbol={tvSymbol} initialPoints={initialPoints} />
+      <CoinTradeWorkspace
+        coinId={coin.id}
+        coinName={coin.name}
+        symbol={coin.symbol}
+        price={m.current_price.usd}
+        tradingViewSymbol={tvSymbol}
+        initialPoints={initialPoints}
+      />
       <CoinStats coin={coin} />
       <WhereToBuy name={coin.name} symbol={coin.symbol} />
       <CoinAbout coin={coin} />

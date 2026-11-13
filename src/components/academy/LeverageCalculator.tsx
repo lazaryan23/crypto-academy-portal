@@ -3,15 +3,7 @@
 import { useState } from "react";
 import { Alert, Badge, Group, NumberInput, Paper, Progress, SegmentedControl, SimpleGrid, Slider, Stack, Text } from "@mantine/core";
 import { formatPrice } from "@/lib/format";
-
-const MAINTENANCE_MARGIN = 0.005;
-
-function riskLevel(leverage: number) {
-  if (leverage <= 3) return { label: "Conservative", color: "teal" };
-  if (leverage <= 10) return { label: "Moderate", color: "yellow" };
-  if (leverage <= 25) return { label: "Aggressive", color: "orange" };
-  return { label: "Extreme", color: "red" };
-}
+import { MAINTENANCE_MARGIN, liquidationPrice, moveToLiquidation, riskLevel } from "@/lib/trading";
 
 export function LeverageCalculator() {
   const [side, setSide] = useState<"long" | "short">("long");
@@ -21,8 +13,8 @@ export function LeverageCalculator() {
 
   const size = margin * leverage;
   const qty = entry > 0 ? size / entry : 0;
-  const moveToLiq = Math.max(0, 1 / leverage - MAINTENANCE_MARGIN);
-  const liqPrice = side === "long" ? entry * (1 - moveToLiq) : entry * (1 + moveToLiq);
+  const moveToLiq = moveToLiquidation(leverage);
+  const liqPrice = liquidationPrice(side, entry, leverage);
   const pnlPerPct = size * 0.01;
   const risk = riskLevel(leverage);
 
@@ -94,7 +86,7 @@ export function LeverageCalculator() {
               Est. liquidation price
             </Text>
             <Text fw={700} ff="monospace" c="red">
-              {leverage === 1 && side === "long" ? "—" : formatPrice(liqPrice)}
+              {liqPrice === null ? "—" : formatPrice(liqPrice)}
             </Text>
           </Stack>
           <Stack gap={0}>

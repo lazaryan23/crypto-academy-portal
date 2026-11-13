@@ -26,6 +26,11 @@ export function formatPrice(value: number | null | undefined): string {
   }).format(value);
 }
 
+export function formatUsd(value: number | null | undefined): string {
+  if (value == null || Number.isNaN(value)) return "—";
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+}
+
 export function formatCompactUsd(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) return "—";
   const formatted = compactValue(value);
