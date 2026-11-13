@@ -138,7 +138,7 @@ async function cachedDerivatives(base: string): Promise<Outcome> {
     cacheLife("hours");
     return { status: "unlisted" };
   }
-  cacheLife({ stale: 0, revalidate: 30, expire: 120 });
+  cacheLife({ stale: 0, revalidate: 30, expire: 300 });
   return { status: "error" };
 }
 
