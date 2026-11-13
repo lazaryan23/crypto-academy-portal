@@ -222,8 +222,20 @@ function LeverageZones({ initial }: { initial: LeverageMap | null }) {
   );
 }
 
+function isIncomplete(setup: LiquidationSetup) {
+  return !Object.keys(setup.bybitSymbols).length || !Object.keys(setup.okxContractValues).length;
+}
+
+function mergeSetup(current: LiquidationSetup, fresh: LiquidationSetup): LiquidationSetup {
+  return {
+    okxContractValues: Object.keys(current.okxContractValues).length ? current.okxContractValues : fresh.okxContractValues,
+    bybitSymbols: Object.keys(current.bybitSymbols).length ? current.bybitSymbols : fresh.bybitSymbols,
+    trackedBases: current.trackedBases.length ? current.trackedBases : fresh.trackedBases,
+  };
+}
+
 export function LiquidationsDashboard({
-  setup,
+  setup: initialSetup,
   initialRecent,
   initialMap,
 }: {
@@ -231,7 +243,22 @@ export function LiquidationsDashboard({
   initialRecent: RecentLiquidations | null;
   initialMap: LeverageMap | null;
 }) {
+  const [setup, setSetup] = useState(initialSetup);
   const feed = useLiquidationFeed({ okxContractValues: setup.okxContractValues, bybitSymbols: setup.bybitSymbols });
+
+  useEffect(() => {
+    if (!isIncomplete(initialSetup)) return;
+    let active = true;
+    fetch("/api/liquidations/setup", { cache: "no-store" })
+      .then((res) => (res.ok ? (res.json() as Promise<LiquidationSetup>) : Promise.reject(new Error(String(res.status)))))
+      .then((fresh) => {
+        if (active) setSetup((current) => mergeSetup(current, fresh));
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [initialSetup]);
   const [recent, setRecent] = useState(initialRecent);
 
   const refresh = useCallback(() => {
