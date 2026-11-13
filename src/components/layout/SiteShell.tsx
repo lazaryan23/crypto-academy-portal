@@ -100,7 +100,7 @@ export function SiteShell({
             </Group>
 
             <Group gap="xs" wrap="nowrap">
-              <Box visibleFrom="xs" w={{ xs: 260, lg: 320 }}>
+              <Box visibleFrom="xs" w={{ xs: 260, xl: 320 }}>
                 <CoinSearch shortcutHint />
               </Box>
               <ColorSchemeToggle />
