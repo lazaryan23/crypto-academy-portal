@@ -59,16 +59,16 @@ async function cachedOkxContractValues(): Promise<ContractValues | null> {
 async function cachedBybitSymbols(): Promise<Record<string, string> | null> {
   "use cache";
   try {
-    type Instrument = { symbol: string; baseCoin: string; quoteCoin: string; status: string; contractType: string };
-    const body = await getJson<{ retCode: number; result: { list: Instrument[] } }>("https://api.bybit.com/v5/market/instruments-info?category=linear&limit=1000");
+    const body = await getJson<{ retCode: number; result: { list: { symbol: string }[] } }>("https://api.bybit.com/v5/market/tickers?category=linear");
     if (body.retCode !== 0) throw new Error(String(body.retCode));
     const symbols: Record<string, string> = {};
-    for (const item of body.result.list) {
-      if (item.quoteCoin !== "USDT" || item.contractType !== "LinearPerpetual" || item.status !== "Trading") continue;
-      const { base } = parseContract(item.baseCoin);
-      if (!symbols[base] || item.symbol === `${base}USDT`) symbols[base] = item.symbol;
+    for (const { symbol } of body.result.list) {
+      if (!symbol.endsWith("USDT") || symbol.includes("-")) continue;
+      const { base } = parseContract(symbol.slice(0, -4));
+      if (!symbols[base] || symbol === `${base}USDT`) symbols[base] = symbol;
     }
-    cacheLife("days");
+    if (!Object.keys(symbols).length) throw new Error("empty");
+    cacheLife("hours");
     return symbols;
   } catch {
     cacheLife(FAILURE_LIFE);
@@ -148,9 +148,15 @@ async function cachedRecentLiquidations(familyList: string): Promise<RecentLiqui
 export async function getLiquidationSetup(): Promise<LiquidationSetup> {
   const [overview, okxContractValues, bybitSymbols] = await Promise.all([getDerivativesOverview(), cachedOkxContractValues(), cachedBybitSymbols()]);
   const ranked = [...overview.rows].sort((a, b) => (b.totalOiUsd ?? 0) - (a.totalOiUsd ?? 0)).map((row) => row.symbol);
+  const bybitListed = new Set(overview.rows.filter((row) => row.venues.Bybit).map((row) => row.symbol));
   return {
     okxContractValues: okxContractValues ?? {},
-    bybitSymbols: Object.fromEntries(ranked.filter((base) => bybitSymbols?.[base]).slice(0, BYBIT_SUBSCRIPTIONS).map((base) => [bybitSymbols![base], base])),
+    bybitSymbols: Object.fromEntries(
+      ranked
+        .filter((base) => bybitListed.has(base))
+        .slice(0, BYBIT_SUBSCRIPTIONS)
+        .map((base) => [bybitSymbols?.[base] ?? `${base}USDT`, base]),
+    ),
     trackedBases: ranked,
   };
 }

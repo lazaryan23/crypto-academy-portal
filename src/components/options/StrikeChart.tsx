@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/format";
 const HEIGHT = 320;
 const TOP = 18;
 const BOTTOM = 26;
+const EDGE_LABEL = 18;
 const CALL_COLOR = "var(--mantine-color-teal-6)";
 const PUT_COLOR = "var(--mantine-color-red-6)";
 
@@ -91,7 +92,14 @@ export function StrikeChart({ strikes, spot, maxPain, unit }: { strikes: StrikeR
             )}
             {strikes.map((row, i) =>
               i % labelEvery === 0 ? (
-                <text key={row.strike} x={xOf(i)} y={HEIGHT - 8} textAnchor="middle" fontSize={11} fill="var(--mantine-color-dimmed)">
+                <text
+                  key={row.strike}
+                  x={Math.min(Math.max(xOf(i), EDGE_LABEL), width - EDGE_LABEL)}
+                  y={HEIGHT - 8}
+                  textAnchor="middle"
+                  fontSize={11}
+                  fill="var(--mantine-color-dimmed)"
+                >
                   {strikeLabel(row.strike)}
                 </text>
               ) : null,
