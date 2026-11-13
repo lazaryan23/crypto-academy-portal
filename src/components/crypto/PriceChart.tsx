@@ -138,7 +138,7 @@ export function PriceChart({
     );
     return () => {
       levelsRef.current = [];
-      lines.forEach((line) => target.removePriceLine(line));
+      if (series.current === target) lines.forEach((line) => target.removePriceLine(line));
     };
   }, [levels]);
 
