@@ -79,6 +79,45 @@ export function GlobalSpotlight({ index }: { index: SpotlightIndex }) {
 
   const go = (href: string) => router.push(href);
 
+  const coinsGroup = coins.length > 0 && (
+    <SpotlightActionsGroup label={searching ? "Coins" : "Top coins"}>
+      {coins.map((coin) => (
+        <SpotlightAction
+          key={coin.id}
+          onClick={() => go(`/crypto/${coin.id}`)}
+          leftSection={<Avatar src={coin.image} alt="" size={24} />}
+          label={coin.name}
+          description={`${coin.symbol.toUpperCase()}${coin.rank ? ` · #${coin.rank}` : ""}`}
+          rightSection={
+            coin.price != null ? (
+              <Text size="xs" ff="monospace" fw={600}>
+                {formatPrice(coin.price)}
+              </Text>
+            ) : null
+          }
+        />
+      ))}
+    </SpotlightActionsGroup>
+  );
+
+  const pagesGroup = pages.length > 0 && (
+    <SpotlightActionsGroup label="Pages & tools">
+      {pages.map((page) => (
+        <SpotlightAction
+          key={page.href}
+          onClick={() => go(page.href)}
+          leftSection={
+            <ThemeIcon variant="light" size={24} radius="sm">
+              <IconCompass size={14} />
+            </ThemeIcon>
+          }
+          label={page.label}
+          description={page.description}
+        />
+      ))}
+    </SpotlightActionsGroup>
+  );
+
   return (
     <SpotlightRoot
       query={query}
@@ -96,43 +135,8 @@ export function GlobalSpotlight({ index }: { index: SpotlightIndex }) {
         aria-label="Search the site"
       />
       <SpotlightActionsList>
-        {coins.length > 0 && (
-          <SpotlightActionsGroup label={searching ? "Coins" : "Top coins"}>
-            {coins.map((coin) => (
-              <SpotlightAction
-                key={coin.id}
-                onClick={() => go(`/crypto/${coin.id}`)}
-                leftSection={<Avatar src={coin.image} alt="" size={24} />}
-                label={coin.name}
-                description={`${coin.symbol.toUpperCase()}${coin.rank ? ` · #${coin.rank}` : ""}`}
-                rightSection={
-                  coin.price != null ? (
-                    <Text size="xs" ff="monospace" fw={600}>
-                      {formatPrice(coin.price)}
-                    </Text>
-                  ) : null
-                }
-              />
-            ))}
-          </SpotlightActionsGroup>
-        )}
-        {pages.length > 0 && (
-          <SpotlightActionsGroup label="Pages & tools">
-            {pages.map((page) => (
-              <SpotlightAction
-                key={page.href}
-                onClick={() => go(page.href)}
-                leftSection={
-                  <ThemeIcon variant="light" size={24} radius="sm">
-                    <IconCompass size={14} />
-                  </ThemeIcon>
-                }
-                label={page.label}
-                description={page.description}
-              />
-            ))}
-          </SpotlightActionsGroup>
-        )}
+        {needle ? pagesGroup : coinsGroup}
+        {needle ? coinsGroup : pagesGroup}
         {pairs.length > 0 && (
           <SpotlightActionsGroup label="Comparisons">
             {pairs.map((pair) => (
