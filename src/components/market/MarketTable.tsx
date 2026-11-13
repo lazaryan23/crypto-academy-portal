@@ -24,7 +24,7 @@ export function MarketTable({
       <Table verticalSpacing="sm" horizontalSpacing="md">
         <TableThead>
           <TableTr>
-            <TableTh w={40} px={0}>
+            <TableTh w={48} pl="sm" pr={0}>
               <span className={classes.srOnly}>Watchlist</span>
             </TableTh>
             <TableTh w={40} pl={0}>
@@ -54,7 +54,7 @@ export function MarketTable({
               onClick={() => router.push(`/crypto/${coin.id}`)}
               className={classes.row}
             >
-              <TableTd px={0}>
+              <TableTd pl="sm" pr={0}>
                 <WatchlistButton coinId={coin.id} coinName={coin.name} size="sm" />
               </TableTd>
               <TableTd pl={0}>
