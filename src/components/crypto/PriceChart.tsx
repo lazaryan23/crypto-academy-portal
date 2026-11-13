@@ -24,6 +24,7 @@ const ranges: { value: ChartRange; label: string }[] = [
 ];
 
 const initialRange: ChartRange = "1";
+const RETRY_MS = 20_000;
 const solidLine = 0 as LineStyle;
 const dashedLine = 2 as LineStyle;
 
@@ -75,6 +76,12 @@ export function PriceChart({
       });
     return () => controller.abort();
   }, [coinId, range, key, hasData]);
+
+  useEffect(() => {
+    if (!error) return;
+    const retry = window.setTimeout(() => setResult((prev) => ({ ...prev, key: "" })), RETRY_MS);
+    return () => window.clearTimeout(retry);
+  }, [error]);
 
   useEffect(() => {
     if (!container.current) return;
