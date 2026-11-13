@@ -32,7 +32,9 @@ export function HeroSection() {
           <m.div variants={container} initial="hidden" animate="show">
             <Stack gap="lg">
               <Title order={1} id="hero-title" className={classes.title}>
-                Track the crypto market. Learn to trade it safely.
+                Track the crypto market.
+                <br />
+                Learn to trade it safely.
               </Title>
 
               <m.div variants={item}>
