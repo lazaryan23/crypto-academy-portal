@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Badge, Container, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import { Badge, Container, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { IconArrowRight, IconBook2, IconChartCandle, IconScale } from "@tabler/icons-react";
 import { ButtonLink, CardLink } from "@/components/common/Links";
 import { getMarkets } from "@/lib/coingecko";
@@ -17,9 +17,9 @@ async function LiveMarkets() {
 }
 
 const features = [
-  { icon: IconChartCandle, title: "Live markets", text: "Prices, volume and market cap refreshed every minute.", href: "#markets", gradient: { from: "cyan", to: "blue" } },
-  { icon: IconBook2, title: "Trading Academy", text: "Spot vs futures, longs & shorts, leverage and risk.", href: "/academy", gradient: { from: "blue", to: "violet" } },
-  { icon: IconScale, title: "Investing guide", text: "Long-term allocation frameworks and how to size risk.", href: "/investing-guide", gradient: { from: "violet", to: "grape" } },
+  { icon: IconChartCandle, title: "Live markets", text: "Prices, volume and market cap refreshed every minute.", href: "#markets" },
+  { icon: IconBook2, title: "Trading Academy", text: "Spot vs futures, longs & shorts, leverage and risk.", href: "/academy" },
+  { icon: IconScale, title: "Investing guide", text: "Long-term allocation frameworks and how to size risk.", href: "/investing-guide" },
 ];
 
 export default function HomePage() {
@@ -44,12 +44,10 @@ export default function HomePage() {
             <Reveal key={feature.title} delay={i * 0.08}>
               <HoverLift>
                 <CardLink href={feature.href} padding="lg" h="100%">
-                  <ThemeIcon size={44} radius="md" variant="gradient" gradient={feature.gradient}>
-                    <feature.icon size={24} />
-                  </ThemeIcon>
-                  <Text fw={700} mt="md">
-                    {feature.title}
-                  </Text>
+                  <Group gap="xs" wrap="nowrap">
+                    <feature.icon size={20} color="var(--mantine-color-brand-filled)" aria-hidden="true" />
+                    <Text fw={700}>{feature.title}</Text>
+                  </Group>
                   <Text size="sm" c="dimmed" mt={4}>
                     {feature.text}
                   </Text>
@@ -60,7 +58,7 @@ export default function HomePage() {
         </SimpleGrid>
 
         <Reveal>
-          <HoverLift scale={1.015}>
+          <HoverLift>
             <PromoCallout />
           </HoverLift>
         </Reveal>

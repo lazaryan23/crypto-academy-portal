@@ -72,7 +72,7 @@ function SortHeader({
   return (
     <TableTh ta={align} visibleFrom={desktopOnly ? "sm" : undefined} style={{ whiteSpace: "nowrap" }} aria-sort={active ? (sort.desc ? "descending" : "ascending") : undefined}>
       <UnstyledButton onClick={() => onSort(sortKey)} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-        <Text size="xs" fw={700} c={active ? undefined : "dimmed"} tt="uppercase">
+        <Text size="xs" fw={700} c={active ? undefined : "dimmed"}>
           {label}
         </Text>
         <Icon size={14} stroke={1.8} style={{ opacity: active ? 1 : 0.5 }} />
@@ -86,7 +86,7 @@ function stickyCell(selected: boolean) {
     position: "sticky",
     left: 0,
     zIndex: 1,
-    backgroundColor: "var(--mantine-color-body)",
+    backgroundColor: "var(--page-bg)",
     backgroundImage: selected ? "linear-gradient(var(--mantine-primary-color-light), var(--mantine-primary-color-light))" : undefined,
   } as const;
 }
@@ -169,7 +169,7 @@ export function FundingTable({ rows, selected, onSelect }: { rows: DerivativesRo
             <TableTr>
               <SortHeader label="#" sortKey="rank" sort={sort} onSort={onSort} align="left" desktopOnly />
               <TableTh style={stickyCell(false)}>
-                <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+                <Text size="xs" fw={700} c="dimmed">
                   Coin
                 </Text>
               </TableTh>

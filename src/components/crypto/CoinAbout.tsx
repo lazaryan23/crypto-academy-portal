@@ -11,7 +11,7 @@ function Fact({ icon: Icon, label, value }: { icon: typeof IconUsers; label: str
         <Icon size={18} />
       </ThemeIcon>
       <Stack gap={0}>
-        <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+        <Text size="xs" c="dimmed" fw={600}>
           {label}
         </Text>
         <Text size="sm" fw={500}>

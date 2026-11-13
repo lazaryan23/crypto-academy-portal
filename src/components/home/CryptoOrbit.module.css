@@ -7,17 +7,6 @@
   isolation: isolate;
 }
 
-.glow {
-  position: absolute;
-  inset: 22%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.55), rgba(139, 92, 246, 0.35) 45%, transparent 70%);
-  filter: blur(18px);
-  animation: breathe 4s ease-in-out infinite;
-  z-index: -1;
-  will-change: transform, opacity;
-}
-
 .ring {
   position: absolute;
   border-radius: 50%;
@@ -33,7 +22,7 @@
 .ringInner {
   inset: 22%;
   border-style: solid;
-  border-color: color-mix(in srgb, var(--mantine-color-violet-4) 30%, transparent);
+  border-color: color-mix(in srgb, var(--mantine-color-cyan-4) 22%, transparent);
   animation: spin 32s linear infinite reverse;
 }
 
@@ -132,7 +121,7 @@
 
 .center::after {
   animation-delay: 1.4s;
-  border-color: rgba(167, 139, 250, 0.55);
+  border-color: rgba(34, 211, 238, 0.35);
 }
 
 .spark {
@@ -148,18 +137,6 @@
 @keyframes spin {
   to {
     rotate: 360deg;
-  }
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(0.9);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1.12);
-    opacity: 1;
   }
 }
 
@@ -185,7 +162,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .glow,
   .ring,
   .counter,
   .center::before,

@@ -1,13 +1,10 @@
 .row {
   cursor: pointer;
-  transition:
-    background-color 200ms ease,
-    box-shadow 200ms ease;
+  transition: background-color 150ms ease-out;
 }
 
 .row:hover {
-  background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(139, 92, 246, 0.1));
-  box-shadow: inset 3px 0 0 var(--mantine-color-cyan-5);
+  background-color: var(--mantine-color-default-hover);
 }
 
 .row:hover .coinName {
@@ -15,7 +12,7 @@
 }
 
 .coinName {
-  transition: color 200ms ease;
+  transition: color 150ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {

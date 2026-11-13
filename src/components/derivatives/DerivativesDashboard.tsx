@@ -26,7 +26,7 @@ function readCoinParam() {
 function SummaryCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <Paper withBorder p="md" radius="md">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.4} mb={6}>
+      <Text size="xs" c="dimmed" fw={600} mb={6}>
         {label}
       </Text>
       {children}

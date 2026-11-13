@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Alert, Badge, Container, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Alert, Container, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { MarketHeatmap, type HeatmapCoin } from "@/components/heatmap/MarketHeatmap";
 import { defaultOgImages } from "@/config/site";
 import { getTopMarkets } from "@/lib/coingecko";
@@ -59,9 +59,6 @@ export default function HeatmapPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={780}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Heatmap
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Crypto market heatmap
           </Title>

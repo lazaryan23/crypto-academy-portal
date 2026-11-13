@@ -82,7 +82,7 @@ async function copyText(text: string) {
 function Stat({ label, value, hint, color }: { label: string; value: string; hint?: string; color?: string }) {
   return (
     <Stack gap={2}>
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+      <Text size="xs" c="dimmed" fw={600}>
         {label}
       </Text>
       <Text fz={20} fw={700} ff="monospace" c={color}>

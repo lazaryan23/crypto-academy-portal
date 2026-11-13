@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Badge, Code, Container, List, ListItem, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Code, Container, List, ListItem, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { AnchorLink } from "@/components/common/Links";
 import { Disclaimer } from "@/components/common/Disclaimer";
 import { ProfitCalculator, type CalculatorCoin } from "@/components/tools/ProfitCalculator";
@@ -41,9 +41,6 @@ export default function CalculatorPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={780}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Tool
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Crypto profit &amp; tax calculator
           </Title>

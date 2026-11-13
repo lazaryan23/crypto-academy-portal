@@ -13,15 +13,27 @@ const brand: MantineColorsTuple = [
   "#006f83",
 ];
 
+const dark: MantineColorsTuple = [
+  "#cfd7de",
+  "#aeb8c2",
+  "#8d99a6",
+  "#62707e",
+  "#3a4551",
+  "#2c3540",
+  "#222a33",
+  "#181e25",
+  "#12171d",
+  "#0c1014",
+];
+
 export const theme = createTheme({
   primaryColor: "brand",
   primaryShade: { light: 7, dark: 6 },
-  colors: { brand },
-  fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif",
+  colors: { brand, dark },
+  fontFamily: "var(--font-body), ui-sans-serif, system-ui, sans-serif",
   fontFamilyMonospace: "var(--font-mono), ui-monospace, monospace",
-  headings: { fontFamily: "var(--font-inter), system-ui, sans-serif", fontWeight: "700" },
+  headings: { fontFamily: "var(--font-display), ui-sans-serif, system-ui, sans-serif", fontWeight: "700" },
   defaultRadius: "md",
-  defaultGradient: { from: "cyan", to: "violet", deg: 120 },
   cursorType: "pointer",
   components: {
     Card: { defaultProps: { withBorder: true, radius: "lg" } },

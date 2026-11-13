@@ -159,8 +159,8 @@ export function CoinSearch({ onNavigate, shortcutHint }: { onNavigate?: () => vo
               <Text size="sm" truncate>
                 {option.label}
               </Text>
-              <Text size="xs" c="dimmed" tt="uppercase">
-                {coin?.symbol}
+              <Text size="xs" c="dimmed">
+                {coin?.symbol.toUpperCase()}
               </Text>
             </Stack>
             {coin?.price != null && (

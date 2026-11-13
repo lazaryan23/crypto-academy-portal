@@ -41,7 +41,7 @@ function nextFunding(timestamp: number | null) {
 function Metric({ label, value, color, children }: { label: string; value: string; color?: string; children: React.ReactNode }) {
   return (
     <Stack gap={6}>
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.4}>
+      <Text size="xs" c="dimmed" fw={600}>
         {label}
       </Text>
       <Text fz={22} fw={700} ff="monospace" c={color}>

@@ -23,8 +23,8 @@ export async function LongTermPicks() {
                   </Avatar>
                   <Stack gap={0}>
                     <Text fw={700}>{market?.name ?? pick.id}</Text>
-                    <Text size="xs" c="dimmed" tt="uppercase">
-                      {market?.symbol}
+                    <Text size="xs" c="dimmed">
+                      {market?.symbol.toUpperCase()}
                     </Text>
                   </Stack>
                 </Group>

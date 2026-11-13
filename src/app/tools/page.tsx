@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Badge, Container, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import { Container, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconArrowsLeftRight, IconCalculator, IconChartLine, IconGasStation } from "@tabler/icons-react";
 import { CardLink } from "@/components/common/Links";
 import { defaultOgImages } from "@/config/site";
@@ -47,9 +47,6 @@ export default function ToolsPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={760}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Tools
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Free crypto tools
           </Title>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Badge, Container, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Container, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { CryptoConverter, type ConverterCoin, type ConverterFiat } from "@/components/tools/CryptoConverter";
 import { GasTracker } from "@/components/tools/GasTracker";
 import { defaultOgImages } from "@/config/site";
@@ -58,9 +58,6 @@ export default function GasConverterPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={780}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Tool
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Gas tracker &amp; crypto converter
           </Title>

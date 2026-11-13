@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono, Rethink_Sans } from "next/font/google";
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/spotlight/styles.css";
@@ -15,7 +15,8 @@ import { guides } from "@/content/academy";
 import { pairCoinNames, pairSlug, popularPairs } from "@/lib/pairs";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const body = Hanken_Grotesk({ variable: "--font-body", subsets: ["latin"] });
+const display = Rethink_Sans({ variable: "--font-display", subsets: ["latin"] });
 const mono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -95,7 +96,7 @@ const spotlightIndex: SpotlightIndex = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${mono.variable}`} {...mantineHtmlProps}>
+    <html lang="en" className={`${body.variable} ${display.variable} ${mono.variable}`} {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>

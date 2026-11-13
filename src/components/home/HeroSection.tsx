@@ -3,8 +3,8 @@
 import Link from "next/link";
 import * as m from "framer-motion/m";
 import type { Variants } from "framer-motion";
-import { Badge, Button, Grid, GridCol, Group, Stack, Text, Title } from "@mantine/core";
-import { IconArrowRight, IconBolt, IconChartCandle, IconSchool, IconShieldCheck } from "@tabler/icons-react";
+import { Button, Grid, GridCol, Group, Stack, Text, Title } from "@mantine/core";
+import { IconBolt, IconChartCandle, IconSchool, IconShieldCheck } from "@tabler/icons-react";
 import { CryptoOrbit } from "./CryptoOrbit";
 import classes from "./HeroSection.module.css";
 
@@ -14,8 +14,8 @@ const container: Variants = {
 };
 
 const item: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { y: 10 },
+  show: { y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
 };
 
 const highlights = [
@@ -31,20 +31,8 @@ export function HeroSection() {
         <GridCol span={{ base: 12, md: 7 }} order={{ base: 1, md: 1 }}>
           <m.div variants={container} initial="hidden" animate="show">
             <Stack gap="lg">
-              <m.div variants={item}>
-                <Badge
-                  size="lg"
-                  variant="gradient"
-                  gradient={{ from: "cyan", to: "violet", deg: 90 }}
-                  leftSection={<span className={classes.liveDot} />}
-                >
-                  Live crypto market dashboard
-                </Badge>
-              </m.div>
-
               <Title order={1} id="hero-title" className={classes.title}>
-                Track the crypto market.{" "}
-                <span className={classes.gradientText}>Learn to trade it safely.</span>
+                Track the crypto market. Learn to trade it safely.
               </Title>
 
               <m.div variants={item}>
@@ -56,31 +44,12 @@ export function HeroSection() {
 
               <m.div variants={item}>
                 <Group gap="sm">
-                  <m.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-                    <Button
-                      component="a"
-                      href="#markets"
-                      size="md"
-                      variant="gradient"
-                      gradient={{ from: "cyan", to: "violet", deg: 120 }}
-                      leftSection={<IconChartCandle size={18} />}
-                      className={classes.ctaPrimary}
-                    >
-                      Explore markets
-                    </Button>
-                  </m.div>
-                  <m.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-                    <Button
-                      component={Link}
-                      href="/academy"
-                      size="md"
-                      variant="default"
-                      className={classes.ctaGhost}
-                      rightSection={<IconArrowRight size={18} />}
-                    >
-                      Start learning
-                    </Button>
-                  </m.div>
+                  <Button component="a" href="#markets" size="md" leftSection={<IconChartCandle size={18} />}>
+                    Explore markets
+                  </Button>
+                  <Button component={Link} href="/academy" size="md" variant="default">
+                    Start learning
+                  </Button>
                 </Group>
               </m.div>
 
@@ -102,9 +71,9 @@ export function HeroSection() {
 
         <GridCol span={{ base: 12, md: 5 }} order={{ base: 2, md: 2 }}>
           <m.div
-            initial={{ opacity: 0, scale: 0.85, rotate: -20 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ scale: 0.96 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className={classes.orbitWrap}
           >
             <CryptoOrbit />

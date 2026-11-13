@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { defaultOgImages } from "@/config/site";
 import { Suspense } from "react";
-import { Badge, Card, Container, Group, SimpleGrid, Skeleton, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import { Card, Container, Group, SimpleGrid, Skeleton, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconArrowsLeftRight, IconCalculator, IconCircleCheck } from "@tabler/icons-react";
 import { CardLink } from "@/components/common/Links";
 import { investingPrinciples } from "@/content/investing";
@@ -34,9 +34,6 @@ export default function InvestingGuidePage() {
     <Container size="xl" py="xl">
       <Stack gap={48}>
         <Stack gap="md" maw={800}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Investment Guide
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Which top cryptos are worth long-term investment?
           </Title>
