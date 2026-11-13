@@ -48,7 +48,7 @@ export function isListedCoin(coin: Pick<CoinMarket, "id" | "symbol">): boolean {
 
 type Result<T> = { ok: true; data: T } | { ok: false; status: number };
 
-const failureCacheLife = { stale: 0, revalidate: 15, expire: 60 };
+const failureCacheLife = { stale: 0, revalidate: 15, expire: 300 };
 
 async function request<T>(path: string, params: Record<string, string | number | boolean> = {}): Promise<Result<T>> {
   const url = new URL(`${BASE_URL}${path}`);
