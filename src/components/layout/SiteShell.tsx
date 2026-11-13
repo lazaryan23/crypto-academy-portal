@@ -27,7 +27,9 @@ import { CoinSearch } from "./CoinSearch";
 import { GlobalSpotlight, type SpotlightIndex } from "./GlobalSpotlight";
 
 function isActive(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" || pathname.startsWith("/crypto") : pathname.startsWith(href);
+  if (href === "/") return pathname === "/" || pathname.startsWith("/crypto");
+  if (href === "/derivatives") return pathname.startsWith("/derivatives") || pathname.startsWith("/liquidations");
+  return pathname.startsWith(href);
 }
 
 function ColorSchemeToggle() {

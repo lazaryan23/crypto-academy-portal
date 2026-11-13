@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Alert, Badge, Container, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Alert, Container, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { AnchorLink } from "@/components/common/Links";
+import { DerivativesTabs } from "@/components/derivatives/DerivativesTabs";
 import { DerivativesDashboard } from "@/components/derivatives/DerivativesDashboard";
 import { defaultOgImages, riskDisclaimer } from "@/config/site";
 import { getDerivativesHistory } from "@/lib/derivatives-history";
@@ -61,9 +62,7 @@ export default function DerivativesPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={820}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Derivatives
-          </Badge>
+          <DerivativesTabs active="/derivatives" />
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Funding rates &amp; open interest
           </Title>

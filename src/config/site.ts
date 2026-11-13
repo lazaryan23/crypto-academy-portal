@@ -27,6 +27,7 @@ export const siteConfig = {
     { label: "News", href: "/news" },
   ],
   tools: [
+    { label: "Liquidations", href: "/liquidations" },
     { label: "Compare coins", href: "/compare" },
     { label: "DCA calculator", href: "/tools/dca" },
     { label: "Profit calculator", href: "/tools/calculator" },

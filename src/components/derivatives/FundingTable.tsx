@@ -86,7 +86,7 @@ function stickyCell(selected: boolean) {
     position: "sticky",
     left: 0,
     zIndex: 1,
-    background: "var(--mantine-color-body)",
+    backgroundColor: "var(--mantine-color-body)",
     backgroundImage: selected ? "linear-gradient(var(--mantine-primary-color-light), var(--mantine-primary-color-light))" : undefined,
   } as const;
 }

@@ -1,6 +1,6 @@
 import { cacheLife } from "next/cache";
 import { getTopMarkets } from "@/lib/coingecko";
-import { toFunding8h, toFundingApr, VENUES, type Venue, type VenueQuote } from "@/lib/funding";
+import { HYPERLIQUID_MULTIPLIER, parseContract, toFunding8h, toFundingApr, VENUES, type Venue, type VenueQuote } from "@/lib/funding";
 import type { CoinMarket } from "@/types/coingecko";
 
 
@@ -38,9 +38,6 @@ export interface DerivativesOverview {
 
 const TIMEOUT_MS = 8000;
 const BINANCE = "https://fapi.binance.com";
-const MULTIPLIER = /^(1000000|100000|10000|1000|100)(?=[A-Z])/;
-const SUFFIX_MULTIPLIER = /(?<=[A-Z]{2})(1000)$/;
-const HYPERLIQUID_MULTIPLIER = /^k()(?=[A-Z])/;
 
 const SUCCESS_LIFE = { stale: 60, revalidate: 60, expire: 600 };
 const FAILURE_LIFE = { stale: 0, revalidate: 20, expire: 300 };
@@ -59,14 +56,6 @@ async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, { ...init, headers: { accept: "application/json", ...init?.headers }, signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (!res.ok) throw new Error(`${url} → ${res.status}`);
   return (await res.json()) as T;
-}
-
-function parseContract(raw: string, pattern = MULTIPLIER) {
-  const suffix = raw.match(SUFFIX_MULTIPLIER);
-  if (suffix) return { base: raw.slice(0, -suffix[0].length), multiplier: Number(suffix[0]) };
-  const match = raw.match(pattern);
-  const multiplier = match ? (match[1] ? Number(match[1]) : 1000) : 1;
-  return { base: raw.replace(pattern, ""), multiplier };
 }
 
 function unitPrice(price: number | null, multiplier: number) {
