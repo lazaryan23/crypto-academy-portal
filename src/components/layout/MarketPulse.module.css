@@ -1,0 +1,28 @@
+.bar {
+  height: 36px;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  background: light-dark(var(--mantine-color-gray-0), rgba(255, 255, 255, 0.02));
+}
+
+.link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--mantine-radius-sm);
+  outline-offset: 2px;
+}
+
+.item {
+  height: 36px;
+}
+
+.info {
+  color: var(--mantine-color-dimmed);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.link:hover .info,
+.link:focus-visible .info {
+  opacity: 1;
+}

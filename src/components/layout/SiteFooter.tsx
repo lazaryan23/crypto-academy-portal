@@ -29,7 +29,7 @@ export function SiteFooter() {
             <Text fw={600} size="sm">
               Explore
             </Text>
-            {siteConfig.nav.map((item) => (
+            {[...siteConfig.nav, ...siteConfig.tools].map((item) => (
               <AnchorLink key={item.href} href={item.href} size="sm" c="dimmed">
                 {item.label}
               </AnchorLink>

@@ -160,7 +160,7 @@ async function cachedMarketChart(id: string, days: ChartRange): Promise<Result<M
     vs_currency: "usd",
     days,
   });
-  cacheLife(result.ok ? { stale: 60, revalidate: days === "1" ? 120 : 900, expire: 86400 } : failureCacheLife);
+  cacheLife(result.ok ? { stale: 60, revalidate: days === "1" ? 120 : days === "7" ? 900 : 3600, expire: 86400 } : failureCacheLife);
   return result;
 }
 
@@ -190,4 +190,66 @@ async function cachedTopCoinIds(limit: number): Promise<Result<string[]>> {
 export async function getTopCoinIds(limit = 100): Promise<string[]> {
   const result = await cachedTopCoinIds(limit);
   return result.ok ? result.data : [];
+}
+
+export interface GlobalMarket {
+  totalMarketCapUsd: number;
+  marketCapChange24h: number | null;
+  totalVolumeUsd: number | null;
+  btcDominance: number | null;
+  btcPriceUsd: number | null;
+}
+
+type GlobalResponse = {
+  data: {
+    total_market_cap: Record<string, number>;
+    total_volume: Record<string, number>;
+    market_cap_percentage: Record<string, number>;
+    market_cap_change_percentage_24h_usd: number;
+  };
+};
+
+async function cachedGlobal(): Promise<Result<GlobalMarket>> {
+  "use cache";
+  const result = await request<GlobalResponse>("/global");
+  if (!result.ok) {
+    cacheLife(failureCacheLife);
+    return result;
+  }
+  cacheLife({ stale: 120, revalidate: 300, expire: 3600 });
+  const { total_market_cap, total_volume, market_cap_percentage, market_cap_change_percentage_24h_usd } = result.data.data;
+  return {
+    ok: true,
+    data: {
+      totalMarketCapUsd: total_market_cap.usd,
+      marketCapChange24h: market_cap_change_percentage_24h_usd ?? null,
+      totalVolumeUsd: total_volume.usd ?? null,
+      btcDominance: market_cap_percentage.btc ?? null,
+      btcPriceUsd: total_market_cap.btc ? total_market_cap.usd / total_market_cap.btc : null,
+    },
+  };
+}
+
+export async function getGlobalMarket(): Promise<GlobalMarket | null> {
+  const result = await cachedGlobal();
+  return result.ok ? result.data : null;
+}
+
+async function cachedFuturesOpenInterestBtc(): Promise<Result<number>> {
+  "use cache";
+  const result = await request<{ open_interest_btc: number | null }[]>("/derivatives/exchanges", {
+    order: "open_interest_btc_desc",
+    per_page: 20,
+  });
+  if (!result.ok) {
+    cacheLife(failureCacheLife);
+    return result;
+  }
+  cacheLife({ stale: 300, revalidate: 600, expire: 7200 });
+  return { ok: true, data: result.data.reduce((sum, exchange) => sum + (exchange.open_interest_btc ?? 0), 0) };
+}
+
+export async function getFuturesOpenInterestBtc(): Promise<number | null> {
+  const result = await cachedFuturesOpenInterestBtc();
+  return result.ok && result.data > 0 ? result.data : null;
 }

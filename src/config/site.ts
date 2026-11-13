@@ -23,6 +23,10 @@ export const siteConfig = {
     { label: "Academy", href: "/academy" },
     { label: "Investing Guide", href: "/investing-guide" },
   ],
+  tools: [
+    { label: "Compare coins", href: "/compare" },
+    { label: "DCA calculator", href: "/tools/dca" },
+  ],
 };
 
 export const defaultOgImages = [
