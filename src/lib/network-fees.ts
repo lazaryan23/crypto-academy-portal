@@ -44,7 +44,7 @@ async function cachedBitcoinFees(): Promise<BitcoinFees | null> {
     cacheLife({ stale: 60, revalidate: 60, expire: 600 });
     return fees as BitcoinFees;
   } catch {
-    cacheLife({ stale: 0, revalidate: 20, expire: 60 });
+    cacheLife({ stale: 0, revalidate: 20, expire: 300 });
     return null;
   }
 }
@@ -107,7 +107,7 @@ async function cachedEthereumGas(): Promise<EthereumGas | null> {
       }
     }
   }
-  cacheLife({ stale: 0, revalidate: 20, expire: 60 });
+  cacheLife({ stale: 0, revalidate: 20, expire: 300 });
   return null;
 }
 
