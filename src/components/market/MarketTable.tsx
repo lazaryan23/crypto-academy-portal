@@ -77,8 +77,8 @@ export function MarketTable({
                     >
                       {coin.name}
                     </Text>
-                    <Text size="xs" c="dimmed" tt="uppercase">
-                      {coin.symbol}
+                    <Text size="xs" c="dimmed">
+                      {coin.symbol.toUpperCase()}
                     </Text>
                   </Stack>
                 </Group>

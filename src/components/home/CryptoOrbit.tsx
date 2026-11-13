@@ -62,7 +62,6 @@ function Orbit({ coins, radius, className }: { coins: OrbitCoin[]; radius: strin
 export function CryptoOrbit() {
   return (
     <div className={classes.root}>
-      <div className={classes.glow} aria-hidden="true" />
       {sparks.map((s) => (
         <span key={s.top + s.left} className={classes.spark} style={{ top: s.top, left: s.left, animationDelay: s.delay }} aria-hidden="true" />
       ))}

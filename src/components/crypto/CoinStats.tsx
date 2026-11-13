@@ -5,7 +5,7 @@ import { formatCompactUsd, formatDate, formatPercent, formatPrice, formatSupply 
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <Card padding="md">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+      <Text size="xs" c="dimmed" fw={600}>
         {label}
       </Text>
       <Text fw={700} ff="monospace" mt={4} size="lg">
@@ -32,7 +32,7 @@ export function CoinStats({ coin }: { coin: CoinDetail }) {
     <Stack gap="md">
       <Card padding="md">
         <Group justify="space-between" mb={6}>
-          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+          <Text size="xs" c="dimmed" fw={600}>
             24h range
           </Text>
           <Text size="xs" c="dimmed">

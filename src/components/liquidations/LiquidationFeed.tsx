@@ -70,7 +70,7 @@ export function LiquidationFeed({ events, coins }: { events: LiquidationEvent[];
             <TableTr>
               {["Time", "Exchange", "Coin", "Side", "Price", "Value"].map((label, i) => (
                 <TableTh key={label} ta={i >= 4 ? "right" : undefined} visibleFrom={label === "Exchange" ? "xs" : label === "Price" ? "sm" : undefined}>
-                  <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+                  <Text size="xs" fw={700} c="dimmed">
                     {label}
                   </Text>
                 </TableTh>

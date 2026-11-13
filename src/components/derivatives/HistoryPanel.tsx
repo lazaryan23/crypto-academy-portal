@@ -61,7 +61,7 @@ function changeOver(points: HistoryPoint[]) {
 function Stat({ label, value, color, hint }: { label: string; value: string; color?: string; hint: string | null }) {
   return (
     <Stack gap={2}>
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.4}>
+      <Text size="xs" c="dimmed" fw={600}>
         {label}
       </Text>
       <Text fz={18} fw={700} ff="monospace" c={color} style={{ whiteSpace: "nowrap" }}>

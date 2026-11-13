@@ -80,7 +80,7 @@ export function SiteShell({
               <Link href="/" onClick={close} style={{ textDecoration: "none" }} aria-label={`${siteConfig.name} home`}>
                 <Group gap={8} wrap="nowrap">
                   <IconCompass size={28} color="var(--mantine-color-brand-5)" />
-                  <Text fw={800} size="lg">
+                  <Text fw={800} size="lg" ff="heading" lts={-0.3}>
                     {siteConfig.name}
                   </Text>
                 </Group>

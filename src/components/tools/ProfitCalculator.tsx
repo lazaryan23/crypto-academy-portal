@@ -93,7 +93,7 @@ function Line({ label, value, strong, color }: { label: string; value: string; s
 function Stat({ label, value, hint, color }: { label: string; value: string; hint?: ReactNode; color?: string }) {
   return (
     <Stack gap={2}>
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+      <Text size="xs" c="dimmed" fw={600}>
         {label}
       </Text>
       <Text fz={20} fw={700} ff="monospace" c={color}>
@@ -312,7 +312,7 @@ export function ProfitCalculator({ coins }: { coins: CalculatorCoin[] }) {
             <Stack gap="lg">
               <Stack gap={4}>
                 <Group gap="xs">
-                  <Text size="sm" c="dimmed" fw={600} tt="uppercase">
+                  <Text size="sm" c="dimmed" fw={600}>
                     {holding ? "Unrealized" : "Net"} {profit ? "profit" : "loss"}
                   </Text>
                   <Badge color={resultColor ?? "gray"} variant="light">

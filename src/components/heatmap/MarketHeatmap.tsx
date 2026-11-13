@@ -88,8 +88,8 @@ function HeatmapTooltip({ coin, timeframe }: { coin: HeatmapCoin; timeframe: Tim
       <Group justify="space-between" gap="md" wrap="nowrap">
         <Text fw={700} size="sm">
           {coin.name}{" "}
-          <Text span c="dimmed" size="xs" tt="uppercase">
-            {coin.symbol}
+          <Text span c="dimmed" size="xs">
+            {coin.symbol.toUpperCase()}
           </Text>
         </Text>
         {coin.rank && (

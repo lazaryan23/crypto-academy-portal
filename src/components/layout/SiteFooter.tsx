@@ -10,7 +10,9 @@ export function SiteFooter() {
       <Container size="xl">
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xl">
           <Stack gap="xs">
-            <Text fw={800}>{siteConfig.name}</Text>
+            <Text fw={800} ff="heading" lts={-0.3}>
+              {siteConfig.name}
+            </Text>
             <Text size="sm" c="dimmed">
               {siteConfig.description}
             </Text>

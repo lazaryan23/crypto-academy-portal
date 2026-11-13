@@ -7,34 +7,7 @@
 .title {
   font-size: clamp(2rem, 1.2rem + 3.6vw, 3.6rem);
   line-height: 1.08;
-  letter-spacing: -0.02em;
-}
-
-.gradientText {
-  background: linear-gradient(100deg, var(--mantine-color-cyan-4), var(--mantine-color-blue-5) 45%, var(--mantine-color-violet-5));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.liveDot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
-  animation: livePulse 1.8s ease-out infinite;
-}
-
-.ctaPrimary {
-  box-shadow: 0 10px 30px -10px rgba(34, 211, 238, 0.65);
-}
-
-.ctaGhost {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  background: color-mix(in srgb, var(--mantine-color-body) 55%, transparent);
+  letter-spacing: -0.025em;
 }
 
 .orbitWrap {
@@ -45,20 +18,5 @@
 @media (max-width: 48em) {
   .orbitWrap {
     width: min(64vw, 260px);
-  }
-}
-
-@keyframes livePulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
-  }
-  100% {
-    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .liveDot {
-    animation: none;
   }
 }

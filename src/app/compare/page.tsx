@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Avatar, Badge, Container, Group, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Avatar, Container, Group, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { CardLink } from "@/components/common/Links";
 import { PairPicker } from "@/components/compare/PairPicker";
 import { popularCoinIds } from "@/content/coin-profiles";
@@ -39,8 +39,8 @@ async function PopularPairs() {
                   <Text fw={700}>
                     {ca?.name ?? a} vs {cb?.name ?? b}
                   </Text>
-                  <Text size="xs" c="dimmed" tt="uppercase">
-                    {ca?.symbol ?? ""} · {cb?.symbol ?? ""}
+                  <Text size="xs" c="dimmed">
+                    {ca?.symbol.toUpperCase() ?? ""} · {cb?.symbol.toUpperCase() ?? ""}
                   </Text>
                 </Stack>
               </Group>
@@ -57,9 +57,6 @@ export default function CompareIndexPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={760}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Compare
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Compare cryptocurrencies side by side
           </Title>

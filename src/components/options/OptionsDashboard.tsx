@@ -62,7 +62,7 @@ function putCallStory(pc: number | null) {
 function Card({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <Paper withBorder p="md" radius="md">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.4} mb={6}>
+      <Text size="xs" c="dimmed" fw={600} mb={6}>
         {label}
       </Text>
       {children}
@@ -161,7 +161,7 @@ function ExpiryTable({ data, selected, onSelect, now }: { data: OptionsOverview;
           <TableTr>
             {["Expiry", "Calls", "Puts", "P/C", "Notional", "Max pain", "ATM IV"].map((label, i) => (
               <TableTh key={label} ta={i ? "right" : undefined}>
-                <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+                <Text size="xs" fw={700} c="dimmed">
                   {label}
                 </Text>
               </TableTh>

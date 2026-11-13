@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Anchor, Badge, Container, Group, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Anchor, Container, Group, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { NewsFeed } from "@/components/news/NewsFeed";
 import { defaultOgImages } from "@/config/site";
 import { getNewsFeed, newsSources } from "@/lib/news";
@@ -36,9 +36,6 @@ export default function NewsPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={780}>
-          <Badge variant="light" size="lg" w="fit-content">
-            News
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             Crypto news
           </Title>

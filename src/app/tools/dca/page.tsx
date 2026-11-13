@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Badge, Container, List, ListItem, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
+import { Container, List, ListItem, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { AnchorLink } from "@/components/common/Links";
 import { Disclaimer } from "@/components/common/Disclaimer";
 import { DcaTool, type DcaCoinOption } from "@/components/tools/DcaTool";
@@ -32,9 +32,6 @@ export default function DcaPage() {
     <Container size="xl" py="xl">
       <Stack gap="xl">
         <Stack gap="sm" maw={780}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Tool
-          </Badge>
           <Title order={1} fz={{ base: 30, sm: 42 }} lh={1.15}>
             DCA backtester: what would regular buys be worth today?
           </Title>

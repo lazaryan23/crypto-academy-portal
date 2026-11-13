@@ -45,7 +45,7 @@ function share(tally: LiquidationTally) {
 function StatCard({ label, value, color, children }: { label: string; value: string; color?: string; children?: React.ReactNode }) {
   return (
     <Paper withBorder p="md" radius="md">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.4} mb={6}>
+      <Text size="xs" c="dimmed" fw={600} mb={6}>
         {label}
       </Text>
       <Text fz={24} fw={700} ff="monospace" c={color}>
@@ -332,7 +332,7 @@ export function LiquidationsDashboard({
         <GridCol span={{ base: 12, lg: 4 }}>
           <Stack gap="lg" h="100%">
             <Paper withBorder p={{ base: "md", sm: "lg" }} radius="md">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.4} mb={6}>
+              <Text size="xs" c="dimmed" fw={600} mb={6}>
                 Since you opened this page
               </Text>
               <Group justify="space-between" mb={6}>
@@ -362,7 +362,7 @@ export function LiquidationsDashboard({
             </Paper>
             {recent && recent.coins.length > 0 && (
               <Paper withBorder p={{ base: "md", sm: "lg" }} radius="md" style={{ flex: 1 }}>
-                <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.4} mb="sm">
+                <Text size="xs" c="dimmed" fw={600} mb="sm">
                   Most liquidated · last hour on OKX
                 </Text>
                 <CoinBars coins={recent.coins.slice(0, 8)} />

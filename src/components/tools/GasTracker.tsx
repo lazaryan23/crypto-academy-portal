@@ -35,7 +35,7 @@ function congestion(level: number, thresholds: [number, number]) {
 function Tier({ label, hint, value, costs }: { label: string; hint: string; value: string; costs: { label: string; value: string }[] }) {
   return (
     <Card withBorder padding="sm" radius="md">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={700}>
+      <Text size="xs" c="dimmed" fw={700}>
         {label}
       </Text>
       <Text size="xs" c="dimmed">

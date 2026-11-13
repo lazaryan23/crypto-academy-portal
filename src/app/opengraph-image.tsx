@@ -16,8 +16,8 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "0 96px",
-          background: "radial-gradient(circle at 85% 20%, #3b2a7a 0%, #0b1020 55%)",
-          color: "#f1f5f9",
+          background: "#12171d",
+          color: "#e6ecf0",
           fontFamily: "sans-serif",
         }}
       >

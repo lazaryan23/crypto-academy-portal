@@ -9,8 +9,8 @@ export function PromoCallout({ compact = false }: { compact?: boolean }) {
       p={compact ? "md" : "xl"}
       withBorder
       style={{
-        background:
-          "linear-gradient(135deg, color-mix(in srgb, var(--mantine-color-brand-6) 18%, transparent), color-mix(in srgb, var(--mantine-color-yellow-6) 12%, transparent))",
+        backgroundColor: "color-mix(in srgb, var(--mantine-color-yellow-6) 9%, var(--mantine-color-body))",
+        borderColor: "color-mix(in srgb, var(--mantine-color-yellow-6) 35%, transparent)",
       }}
     >
       <Group justify="space-between" align="center" gap="lg">

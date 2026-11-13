@@ -29,9 +29,6 @@ export default function AcademyPage() {
     <Container size="xl" py="xl">
       <Stack gap={48}>
         <Stack gap="md" maw={760}>
-          <Badge variant="light" size="lg" w="fit-content">
-            Futures & Trading Academy
-          </Badge>
           <Title order={1} fz={{ base: 32, sm: 44 }} lh={1.15}>
             Learn to trade crypto futures — without blowing up your account
           </Title>

@@ -3,14 +3,9 @@
 import type { ReactNode } from "react";
 import * as m from "framer-motion/m";
 
-export function HoverLift({ children, scale = 1.05 }: { children: ReactNode; scale?: number }) {
+export function HoverLift({ children }: { children: ReactNode }) {
   return (
-    <m.div
-      whileHover={{ scale, y: -4 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 320, damping: 22 }}
-      style={{ height: "100%", willChange: "transform" }}
-    >
+    <m.div whileTap={{ scale: 0.985 }} transition={{ duration: 0.12, ease: "easeOut" }} style={{ height: "100%" }}>
       {children}
     </m.div>
   );
