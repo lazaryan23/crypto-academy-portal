@@ -139,7 +139,11 @@ export async function DerivativesCard({ symbol, name }: { symbol: string; name: 
         </SimpleGrid>
 
         <Text size="xs" c="dimmed">
-          Perpetual futures data from {data.source}&apos;s public API, refreshed every couple of minutes. New to funding rates? Read{" "}
+          Perpetual futures data from {data.source}&apos;s public API, refreshed every couple of minutes.{" "}
+          <AnchorLink href={`/derivatives?coin=${ticker.toLowerCase()}`} size="xs">
+            Compare {ticker} funding across exchanges and see its history
+          </AnchorLink>
+          . New to funding rates? Read{" "}
           <AnchorLink href="/academy/spot-vs-futures" size="xs">
             spot vs. futures
           </AnchorLink>

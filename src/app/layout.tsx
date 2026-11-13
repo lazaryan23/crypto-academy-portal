@@ -79,6 +79,7 @@ const spotlightIndex: SpotlightIndex = {
     { label: "Academy", href: "/academy", description: "Guides on futures, leverage and risk" },
     { label: "Crypto news", href: "/news", description: "Latest headlines from top publishers" },
     { label: "Market heatmap", href: "/heatmap", description: "Top 100 coins by size and performance" },
+    { label: "Funding rates & open interest", href: "/derivatives", description: "Perpetual futures across Binance, Bybit, OKX, Hyperliquid" },
     { label: "Investing guide", href: "/investing-guide", description: "Long-term allocation and DCA" },
     { label: "Compare coins", href: "/compare", description: "Two coins on one chart" },
     { label: "DCA calculator", href: "/tools/dca", description: "Backtest weekly or monthly buys" },
