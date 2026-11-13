@@ -12,6 +12,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/`, changeFrequency: "hourly", priority: 1 },
     { url: `${base}/academy`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/investing-guide`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/tools`, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${base}/tools/calculator`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/tools/dca`, changeFrequency: "daily", priority: 0.8 },
     { url: `${base}/compare`, changeFrequency: "daily", priority: 0.8 },
     ...popularPairs.map(([a, b]) => ({ url: `${base}/compare/${pairSlug(a, b)}`, changeFrequency: "daily" as const, priority: 0.7 })),
