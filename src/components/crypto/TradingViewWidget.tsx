@@ -34,11 +34,9 @@ function TradingViewWidgetBase({ symbol }: { symbol: string }) {
   }, [symbol, scheme]);
 
   return (
-    <Box
-      ref={container}
-      className="tradingview-widget-container"
-      style={{ height: "clamp(480px, 72vh, 680px)", width: "100%" }}
-    />
+    <Box style={{ height: "clamp(480px, 72vh, 680px)", width: "100%" }}>
+      <Box ref={container} className="tradingview-widget-container" style={{ height: "100%", width: "100%" }} />
+    </Box>
   );
 }
 
