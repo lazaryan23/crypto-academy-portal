@@ -14,6 +14,7 @@ import type { SpotlightIndex } from "@/components/layout/GlobalSpotlight";
 import { guides } from "@/content/academy";
 import { pairCoinNames, pairSlug, popularPairs } from "@/lib/pairs";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 
 const body = Hanken_Grotesk({ variable: "--font-body", subsets: ["latin"] });
 const display = Rethink_Sans({ variable: "--font-display", subsets: ["latin"] });
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
       <body>
+        <GoogleAnalytics />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd).replace(/</g, "\\u003c") }} />
         <MantineProvider theme={theme} defaultColorScheme="dark">
           <MotionProvider>

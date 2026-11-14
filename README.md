@@ -16,6 +16,7 @@ npm run dev
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical site URL used for metadata, sitemap and JSON-LD |
 | `COINGECKO_API_KEY` | Optional CoinGecko Demo API key (sent as `x-cg-demo-api-key`). Strongly recommended — the keyless public API is rate limited aggressively |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics 4 Measurement ID. Falls back to the production ID; GA only loads when `NODE_ENV=production` |
 
 ## Routes
 
