@@ -32,6 +32,7 @@ export const siteConfig = {
     { label: "ETF flows", href: "/etf-flows" },
     { label: "Whale transfers", href: "/whales" },
     { label: "Crypto calendar", href: "/calendar" },
+    { label: "Correlations", href: "/correlations" },
     { label: "Compare coins", href: "/compare" },
     { label: "Position size calculator", href: "/tools/position-size" },
     { label: "DCA calculator", href: "/tools/dca" },
