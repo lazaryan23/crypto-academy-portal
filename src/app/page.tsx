@@ -9,6 +9,8 @@ import { PromoCallout } from "@/components/common/PromoCallout";
 import { HeroSection } from "@/components/home/HeroSection";
 import { MarketCompass } from "@/components/MarketCompass";
 import { SentimentPanel, SentimentPanelSkeleton } from "@/components/sentiment/SentimentPanel";
+import { ChainFeesSection } from "@/components/fees/ChainFeesSection";
+import { ChainFeesSkeleton } from "@/components/fees/ChainFeesBoard";
 import { Reveal } from "@/components/motion/Reveal";
 import { HoverLift } from "@/components/motion/HoverLift";
 import { guides } from "@/content/academy";
@@ -35,6 +37,12 @@ export default function HomePage() {
         <Reveal>
           <Suspense fallback={<SentimentPanelSkeleton />}>
             <SentimentPanel />
+          </Suspense>
+        </Reveal>
+
+        <Reveal>
+          <Suspense fallback={<ChainFeesSkeleton />}>
+            <ChainFeesSection />
           </Suspense>
         </Reveal>
 
