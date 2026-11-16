@@ -28,6 +28,7 @@ import { IconAlertCircle, IconCompass, IconInfoCircle } from "@tabler/icons-reac
 import { formatCompactUsd, formatPercent } from "@/lib/format";
 import { COMPASS_TIMEFRAMES, TIMEFRAME_LABELS, describeIndex, type CompassTimeframe, type PressureReading } from "@/lib/buy-pressure";
 import { CompassDial } from "./compass/CompassDial";
+import { CompassLoader } from "./compass/CompassLoader";
 import { CompassDetailModal } from "./compass/CompassDetailModal";
 import { useCompassFeed, type CompassStatus } from "./compass/useCompassFeed";
 import classes from "./MarketCompass.module.css";
@@ -235,7 +236,7 @@ export function MarketCompass() {
   const dial = view ? (
     <CompassDial maxSize={DIAL_MAX} ring={view.ring} leader={view.leader} needleAngle={view.needleAngle} timeframeLabel={tfLabel} onSelect={setSelectedId} />
   ) : (
-    <Skeleton circle mx="auto" style={{ width: `min(100%, ${DIAL_MAX}px)`, height: "auto", aspectRatio: "1" }} />
+    <CompassLoader maxSize={DIAL_MAX} />
   );
 
   const errorAlert = error && !view && (
