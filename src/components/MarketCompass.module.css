@@ -1,0 +1,6 @@
+.heroCard {
+  border-color: color-mix(in srgb, var(--mantine-color-brand-filled) 45%, var(--hairline));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-filled) 12%, transparent),
+    0 24px 60px -32px color-mix(in srgb, var(--mantine-color-brand-filled) 55%, transparent);
+}

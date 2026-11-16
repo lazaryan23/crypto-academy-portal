@@ -34,12 +34,14 @@ const ticks = Array.from({ length: 60 }, (_, i) => i * 6).filter((angle) => {
 const dividers = Array.from({ length: RING_SIZE }, (_, i) => (360 / RING_SIZE) * i + 180 / RING_SIZE);
 
 export function CompassDial({
+  maxSize = 440,
   ring,
   leader,
   needleAngle,
   timeframeLabel,
   onSelect,
 }: {
+  maxSize?: number;
   ring: RingSlot[];
   leader: PressureReading | null;
   needleAngle: number;
@@ -56,7 +58,7 @@ export function CompassDial({
   };
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} style={{ width: `min(100%, ${maxSize}px)` }}>
       <svg className={classes.svg} viewBox="0 0 400 400" role="group" aria-label="Market Compass dial">
         <defs>
           <clipPath id={`${uid}-coin`} clipPathUnits="objectBoundingBox">

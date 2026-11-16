@@ -167,3 +167,16 @@
     opacity: 0;
   }
 }
+
+.needle {
+  animation: needleSweep 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes needleSweep {
+  from {
+    rotate: -270deg;
+  }
+  to {
+    rotate: 0deg;
+  }
+}
