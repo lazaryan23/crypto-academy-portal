@@ -6,12 +6,16 @@ import {
   Alert,
   Avatar,
   Badge,
+  Grid,
+  GridCol,
   Group,
   Paper,
   Popover,
   PopoverDropdown,
   PopoverTarget,
-  SimpleGrid,
+  Progress,
+  ProgressRoot,
+  ProgressSection,
   SegmentedControl,
   Skeleton,
   Stack,
@@ -21,15 +25,17 @@ import {
 } from "@mantine/core";
 import { useDocumentVisibility } from "@mantine/hooks";
 import { IconAlertCircle, IconCompass, IconInfoCircle } from "@tabler/icons-react";
+import { formatCompactUsd, formatPercent } from "@/lib/format";
 import { COMPASS_TIMEFRAMES, TIMEFRAME_LABELS, describeIndex, type CompassTimeframe, type PressureReading } from "@/lib/buy-pressure";
 import { CompassDial } from "./compass/CompassDial";
+import { CompassLoader } from "./compass/CompassLoader";
 import { CompassDetailModal } from "./compass/CompassDetailModal";
 import { useCompassFeed, type CompassStatus } from "./compass/useCompassFeed";
 import classes from "./MarketCompass.module.css";
 
 const OFFSCREEN_GRACE_MS = 15_000;
-const DIAL_MAX = 400;
-const RUNNER_COUNT = 3;
+const DIAL_MAX = 420;
+const RUNNER_COUNT = 5;
 
 const statusStyle: Record<CompassStatus, { color: string; label: string }> = {
   live: { color: "teal", label: "Live" },
@@ -94,33 +100,92 @@ function MethodNote() {
   );
 }
 
+function Leader({ reading, timeframeLabel, onSelect }: { reading: PressureReading | null; timeframeLabel: string; onSelect: (id: string) => void }) {
+  if (!reading) {
+    return (
+      <Paper withBorder p="md" radius="md">
+        <Text size="sm" c="dimmed">
+          No coin has clear net buying over the last {timeframeLabel}. The needle rests until buyers take control.
+        </Text>
+      </Paper>
+    );
+  }
+  const mood = describeIndex(reading.index);
+  return (
+    <UnstyledButton
+      onClick={() => onSelect(reading.id)}
+      aria-label={`${reading.name} buy pressure details`}
+      className={classes.leader}
+    >
+      <Stack gap="sm">
+        <Group justify="space-between" wrap="nowrap">
+          <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+            <Avatar src={reading.image || null} name={reading.symbol} color="initials" alt="" size={40} />
+            <Stack gap={0} style={{ minWidth: 0 }}>
+              <Text size="xs" c="dimmed" tt="uppercase" fw={700}>
+                Needle points to
+              </Text>
+              <Text fw={800} size="lg" truncate>
+                {reading.symbol} <Text span size="sm" c="dimmed" fw={500}>{reading.name}</Text>
+              </Text>
+            </Stack>
+          </Group>
+          <Stack gap={0} align="flex-end">
+            <Text fw={800} size="xl" ff="monospace" c="brand">
+              {Math.round(reading.index)}
+            </Text>
+            <Badge size="xs" variant="light" color={mood.color}>
+              {mood.label}
+            </Badge>
+          </Stack>
+        </Group>
+        <ProgressRoot size="sm" aria-label="Aggressive buys versus sells">
+          <ProgressSection value={reading.buyShare * 100} color="teal" />
+          <ProgressSection value={(1 - reading.buyShare) * 100} color="red" />
+        </ProgressRoot>
+        <Group justify="space-between" gap="xs">
+          <Text size="xs" c="dimmed">
+            Net flow <Text span fw={700} c={reading.netUsd >= 0 ? "teal" : "red"}>{formatCompactUsd(reading.netUsd)}</Text>
+          </Text>
+          <Text size="xs" c="dimmed">
+            Price {timeframeLabel} <Text span fw={700} c={(reading.priceChange ?? 0) >= 0 ? "teal" : "red"}>{formatPercent(reading.priceChange)}</Text>
+          </Text>
+        </Group>
+      </Stack>
+    </UnstyledButton>
+  );
+}
+
 function Runners({ readings, leaderId, onSelect }: { readings: PressureReading[]; leaderId: string | null; onSelect: (id: string) => void }) {
   const runners = readings.filter((r) => r.id !== leaderId).slice(0, RUNNER_COUNT);
   return (
-    <SimpleGrid cols={RUNNER_COUNT} spacing="xs">
+    <Stack gap={6}>
+      <Text size="xs" c="dimmed" tt="uppercase" fw={700}>
+        Next strongest
+      </Text>
       {runners.map((reading, i) => (
         <UnstyledButton
           key={reading.id}
           onClick={() => onSelect(reading.id)}
-          p="xs"
           aria-label={`${reading.name} buy pressure details`}
-          style={{ borderRadius: "var(--mantine-radius-md)", border: "1px solid var(--hairline)", minWidth: 0 }}
+          className={classes.runner}
         >
-          <Group gap={6} wrap="nowrap">
-            <Text size="xs" c="dimmed">
+          <Group gap="sm" wrap="nowrap">
+            <Text size="xs" c="dimmed" w={14}>
               {i + 2}
             </Text>
-            <Avatar src={reading.image || null} name={reading.symbol} color="initials" alt="" size={20} />
+            <Avatar src={reading.image || null} name={reading.symbol} color="initials" alt="" size={24} />
             <Text size="sm" fw={700} truncate style={{ flex: 1, minWidth: 0 }}>
               {reading.symbol}
             </Text>
-            <Text size="xs" fw={700} ff="monospace" c={describeIndex(reading.index).color}>
+            <Progress value={reading.index} size="xs" w={72} color={describeIndex(reading.index).color} aria-hidden="true" />
+            <Text size="sm" fw={700} ff="monospace" w={28} ta="right" c={describeIndex(reading.index).color}>
               {Math.round(reading.index)}
             </Text>
           </Group>
         </UnstyledButton>
       ))}
-    </SimpleGrid>
+    </Stack>
   );
 }
 
@@ -171,7 +236,7 @@ export function MarketCompass() {
   const dial = view ? (
     <CompassDial maxSize={DIAL_MAX} ring={view.ring} leader={view.leader} needleAngle={view.needleAngle} timeframeLabel={tfLabel} onSelect={setSelectedId} />
   ) : (
-    <Skeleton circle mx="auto" style={{ width: `min(100%, ${DIAL_MAX}px)`, height: "auto", aspectRatio: "1" }} />
+    <CompassLoader maxSize={DIAL_MAX} />
   );
 
   const errorAlert = error && !view && (
@@ -182,23 +247,31 @@ export function MarketCompass() {
 
   return (
     <section ref={sectionRef} aria-labelledby="market-compass-title">
-      <Paper withBorder p={{ base: "md", sm: "lg" }} className={classes.heroCard}>
-        <Stack gap="md">
+      <Paper withBorder p={{ base: "md", sm: "xl" }} className={classes.heroCard}>
+        <Stack gap="lg">
           {header}
           {errorAlert}
-          {dial}
-          {view ? (
-            <Runners readings={view.readings} leaderId={view.leader?.id ?? null} onSelect={setSelectedId} />
-          ) : (
-            <SimpleGrid cols={RUNNER_COUNT} spacing="xs">
-              {Array.from({ length: RUNNER_COUNT }, (_, i) => (
-                <Skeleton key={i} height={38} radius="md" />
-              ))}
-            </SimpleGrid>
-          )}
-          <Text size="xs" c="dimmed" ta="center">
-            Tap any coin for live cross-exchange flow, funding and liquidations.
-          </Text>
+          <Grid gap={{ base: "lg", md: 40 }} align="center">
+            <GridCol span={{ base: 12, md: 7 }}>{dial}</GridCol>
+            <GridCol span={{ base: 12, md: 5 }}>
+              {view ? (
+                <Stack gap="lg">
+                  <Leader reading={view.leader} timeframeLabel={tfLabel} onSelect={setSelectedId} />
+                  <Runners readings={view.readings} leaderId={view.leader?.id ?? null} onSelect={setSelectedId} />
+                </Stack>
+              ) : (
+                <Stack gap="sm">
+                  <Skeleton height={120} radius="md" />
+                  {Array.from({ length: RUNNER_COUNT }, (_, i) => (
+                    <Skeleton key={i} height={40} radius="md" />
+                  ))}
+                </Stack>
+              )}
+              <Text size="xs" c="dimmed" mt="md">
+                Tap any coin for live cross-exchange flow, funding and liquidations.
+              </Text>
+            </GridCol>
+          </Grid>
         </Stack>
       </Paper>
 

@@ -5,7 +5,7 @@ import * as m from "framer-motion/m";
 import type { Variants } from "framer-motion";
 import { Button, Grid, GridCol, Group, Stack, Text, Title } from "@mantine/core";
 import { IconBolt, IconChartCandle, IconSchool, IconShieldCheck } from "@tabler/icons-react";
-import { MarketCompass } from "@/components/MarketCompass";
+import { CryptoOrbit } from "./CryptoOrbit";
 import classes from "./HeroSection.module.css";
 
 const container: Variants = {
@@ -28,7 +28,7 @@ export function HeroSection() {
   return (
     <section className={classes.hero} aria-labelledby="hero-title">
       <Grid gap={{ base: 32, md: 48 }} align="center">
-        <GridCol span={{ base: 12, md: 6 }} order={{ base: 1, md: 1 }}>
+        <GridCol span={{ base: 12, md: 7 }} order={{ base: 1, md: 1 }}>
           <m.div variants={container} initial="hidden" animate="show">
             <Stack gap="lg">
               <Title order={1} id="hero-title" className={classes.title}>
@@ -71,13 +71,14 @@ export function HeroSection() {
           </m.div>
         </GridCol>
 
-        <GridCol span={{ base: 12, md: 6 }} order={{ base: 2, md: 2 }}>
+        <GridCol span={{ base: 12, md: 5 }} order={{ base: 2, md: 2 }}>
           <m.div
-            initial={{ y: 16 }}
-            animate={{ y: 0 }}
+            initial={{ scale: 0.96 }}
+            animate={{ scale: 1 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className={classes.orbitWrap}
           >
-            <MarketCompass />
+            <CryptoOrbit />
           </m.div>
         </GridCol>
       </Grid>
