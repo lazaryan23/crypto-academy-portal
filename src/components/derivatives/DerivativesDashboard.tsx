@@ -11,6 +11,7 @@ import { formatCompactUsd } from "@/lib/format";
 import { FundingHeatmap } from "./FundingHeatmap";
 import { FundingTable } from "./FundingTable";
 import { HistoryPanel, type HistoryState } from "./HistoryPanel";
+import { LongShortWidget } from "./LongShortWidget";
 import { SignalScreener } from "./SignalScreener";
 import { formatApr, formatFundingRate, fundingColor } from "./format";
 
@@ -179,6 +180,8 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
   return (
     <Stack gap="xl">
       <Summary overview={overview} />
+
+      <LongShortWidget />
 
       <div ref={panel} style={{ scrollMarginTop: 80 }}>
         <HistoryPanel

@@ -152,8 +152,8 @@ export function FundingHeatmap({ rows, onSelect }: { rows: DerivativesRow[]; onS
         </Box>
       </Box>
       <Text size="xs" c="dimmed">
-        Grey is the 0.01% per 8h baseline most exchanges default to (about {BASELINE_APR}% a year). Arbitrage flags coins whose funding differs by {ARB_SPREAD_APR}%+ a
-        year between exchanges.
+        Grey is the 0.01% per 8h baseline most exchanges default to (about {BASELINE_APR}% a year). Arbitrage flags coins whose funding differs by{" "}
+        {ARB_SPREAD_APR}%+ a year between exchanges.
       </Text>
     </Stack>
   );
