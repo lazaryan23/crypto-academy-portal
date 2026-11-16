@@ -19,6 +19,8 @@ export interface DerivativesRow {
   venues: Partial<Record<Venue, VenueQuote>>;
   totalOiUsd: number | null;
   oiChange24h: number | null;
+  change4h: number | null;
+  oiChange4h: number | null;
   avgFunding8h: number | null;
   spreadApr: number | null;
 }
@@ -216,7 +218,15 @@ async function pool<T, R>(items: T[], size: number, task: (item: T) => Promise<R
   return results;
 }
 
-type BinanceOi = Record<string, { oiUsd: number; change24h: number | null }>;
+type BinanceOi = Record<string, { oiUsd: number; change24h: number | null; change4h: number | null; priceChange4h: number | null }>;
+
+const FOUR_HOURS_MS = 4 * 3_600_000;
+
+function closestTo<T extends { timestamp: number }>(rows: T[], target: number) {
+  let best: T | null = null;
+  for (const row of rows) if (!best || Math.abs(row.timestamp - target) < Math.abs(best.timestamp - target)) best = row;
+  return best;
+}
 
 async function cachedBinanceOpenInterest(contractList: string): Promise<BinanceOi | null> {
   "use cache";
@@ -224,9 +234,10 @@ async function cachedBinanceOpenInterest(contractList: string): Promise<BinanceO
   type Hist = { sumOpenInterest: string; sumOpenInterestValue: string; timestamp: number };
   const entries = await pool(contracts, 8, async (contract) => {
     try {
-      const [current, history] = await Promise.all([
+      const [current, history, candles] = await Promise.all([
         getJson<{ openInterest: string }>(`${BINANCE}/fapi/v1/openInterest?symbol=${contract}`),
         getJson<Hist[]>(`${BINANCE}/futures/data/openInterestHist?symbol=${contract}&period=1h&limit=25`),
+        getJson<[number, string, string, string, string][]>(`${BINANCE}/fapi/v1/klines?symbol=${contract}&interval=15m&limit=17`).catch(() => []),
       ]);
       const latest = history[history.length - 1];
       const dayAgo = history.length >= 25 ? history[0] : null;
@@ -238,7 +249,13 @@ async function cachedBinanceOpenInterest(contractList: string): Promise<BinanceO
       const pastValue = num(dayAgo?.sumOpenInterestValue);
       const pastContracts = num(dayAgo?.sumOpenInterest);
       const change24h = pastContracts ? ((contractsOpen - pastContracts) / pastContracts) * 100 : pastValue ? ((oiUsd - pastValue) / pastValue) * 100 : null;
-      return [contract, { oiUsd, change24h }] as const;
+      const fourHoursAgo = closestTo(history, Date.now() - FOUR_HOURS_MS);
+      const pastContracts4h = num(fourHoursAgo?.sumOpenInterest);
+      const change4h = pastContracts4h ? ((contractsOpen - pastContracts4h) / pastContracts4h) * 100 : null;
+      const open4h = num(candles[0]?.[1]);
+      const last = num(candles[candles.length - 1]?.[4]);
+      const priceChange4h = candles.length >= 16 && open4h && last !== null ? ((last - open4h) / open4h) * 100 : null;
+      return [contract, { oiUsd, change24h, change4h, priceChange4h }] as const;
     } catch {
       return null;
     }
@@ -302,6 +319,8 @@ function buildRow(coin: CoinMarket, venues: Partial<Record<Venue, VenueQuote>>, 
     venues,
     totalOiUsd,
     oiChange24h: binanceOi?.change24h ?? null,
+    change4h: binanceOi?.priceChange4h ?? null,
+    oiChange4h: binanceOi?.change4h ?? null,
     avgFunding8h,
     spreadApr: aprs.length >= 2 ? Math.max(...aprs) - Math.min(...aprs) : null,
   };

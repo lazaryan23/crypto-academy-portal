@@ -5,6 +5,7 @@ import {
   Avatar,
   Badge,
   Button,
+  SegmentedControl,
   Group,
   Paper,
   SimpleGrid,
@@ -23,9 +24,9 @@ import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
 import { IconArrowDownRight, IconArrowUpRight, IconChevronDown, IconChevronUp, IconSelector } from "@tabler/icons-react";
 import type { DerivativesRow } from "@/lib/derivatives-market";
 import { changeColor, formatCompactUsd, formatPercent, formatPrice } from "@/lib/format";
-import { classifySignal, OI_DEADBAND, PRICE_DEADBAND, SIGNAL_ORDER, SIGNALS, signalStrength, type SignalType } from "@/lib/market-signals";
+import { classifySignal, DEADBANDS, SIGNAL_ORDER, SIGNALS, signalStrength, type SignalType, type SignalWindow } from "@/lib/market-signals";
 
-type SortKey = "strength" | "volume" | "oiChange" | "change24h";
+type SortKey = "strength" | "volume" | "oiChange" | "price";
 
 const PAGE = 20;
 
@@ -33,6 +34,8 @@ const quadrantLayout: Exclude<SignalType, "neutral">[] = ["shorts-entering", "lo
 
 interface ScreenedRow {
   row: DerivativesRow;
+  priceChange: number | null;
+  oiChange: number | null;
   signal: SignalType;
   strength: number;
 }
@@ -42,9 +45,9 @@ function sortValue(item: ScreenedRow, key: SortKey) {
     case "volume":
       return item.row.volume24h;
     case "oiChange":
-      return item.row.oiChange24h;
-    case "change24h":
-      return item.row.change24h;
+      return item.oiChange;
+    case "price":
+      return item.priceChange;
     default:
       return item.strength;
   }
@@ -130,16 +133,22 @@ function SortTh({
 }
 
 export function SignalScreener({ rows, onSelect }: { rows: DerivativesRow[]; onSelect: (symbol: string) => void }) {
+  const [span, setSpan] = useState<SignalWindow>("24h");
   const [filter, setFilter] = useState<SignalType | null>(null);
+  const windowLabel = span === "4h" ? "4h" : "24h";
   const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({ key: "strength", desc: true });
   const [limit, setLimit] = useState(PAGE);
 
   const screened = useMemo<ScreenedRow[]>(
     () =>
       rows
-        .filter((row) => row.oiChange24h !== null && row.change24h !== null)
-        .map((row) => ({ row, signal: classifySignal(row.change24h, row.oiChange24h), strength: signalStrength(row.change24h, row.oiChange24h) })),
-    [rows],
+        .map((row) => {
+          const priceChange = span === "4h" ? row.change4h : row.change24h;
+          const oiChange = span === "4h" ? row.oiChange4h : row.oiChange24h;
+          return { row, priceChange, oiChange, signal: classifySignal(priceChange, oiChange, span), strength: signalStrength(priceChange, oiChange) };
+        })
+        .filter((item) => item.priceChange !== null && item.oiChange !== null),
+    [rows, span],
   );
 
   const bySignal = useMemo(() => {
@@ -174,13 +183,28 @@ export function SignalScreener({ rows, onSelect }: { rows: DerivativesRow[]; onS
           </Text>
           <MetricInfoTooltip metric="oiSignals" />
         </Group>
-        <Text size="xs" c="dimmed">
-          24h changes · Binance open interest
-        </Text>
+        <Group gap="xs" wrap="nowrap">
+          <Text size="xs" c="dimmed" visibleFrom="xs">
+            Binance open interest
+          </Text>
+          <SegmentedControl
+            size="xs"
+            value={span}
+            onChange={(value) => {
+              setSpan(value as SignalWindow);
+              setLimit(PAGE);
+            }}
+            data={[
+              { value: "24h", label: "24H" },
+              { value: "4h", label: "4H" },
+            ]}
+            aria-label="Signal timeframe"
+          />
+        </Group>
       </Group>
       <Text size="sm" c="dimmed">
-        Whether open interest rises or falls alongside price shows who is driving the move. Tap a quadrant to filter. Moves under {PRICE_DEADBAND}% in price or{" "}
-        {OI_DEADBAND}% in open interest count as no clear signal.
+        Whether open interest rises or falls alongside price shows who is driving the move. Tap a quadrant to filter. Moves under {DEADBANDS[span].price}% in price or{" "}
+        {DEADBANDS[span].oi}% in open interest count as no clear signal.
       </Text>
 
       <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="sm">
@@ -220,14 +244,14 @@ export function SignalScreener({ rows, onSelect }: { rows: DerivativesRow[]; onS
                     Price
                   </Text>
                 </TableTh>
-                <SortTh label="Price 24h" sortKey="change24h" sort={sort} onSort={onSort} />
-                <SortTh label="OI 24h" sortKey="oiChange" sort={sort} onSort={onSort} />
+                <SortTh label={`Price ${windowLabel}`} sortKey="price" sort={sort} onSort={onSort} />
+                <SortTh label={`OI ${windowLabel}`} sortKey="oiChange" sort={sort} onSort={onSort} />
                 <SortTh label="Volume" sortKey="volume" sort={sort} onSort={onSort} desktopOnly />
                 <SortTh label="Signal" sortKey="strength" sort={sort} onSort={onSort} />
               </TableTr>
             </TableThead>
             <TableTbody>
-              {visible.slice(0, limit).map(({ row, signal }) => {
+              {visible.slice(0, limit).map(({ row, signal, priceChange, oiChange }) => {
                 const info = SIGNALS[signal];
                 return (
                   <TableTr key={row.symbol} onClick={() => onSelect(row.symbol)} style={{ cursor: "pointer" }}>
@@ -242,11 +266,11 @@ export function SignalScreener({ rows, onSelect }: { rows: DerivativesRow[]; onS
                     <TableTd ta="right" ff="monospace" visibleFrom="sm">
                       {formatPrice(row.price)}
                     </TableTd>
-                    <TableTd ta="right" ff="monospace" c={changeColor(row.change24h)}>
-                      {formatPercent(row.change24h)}
+                    <TableTd ta="right" ff="monospace" c={changeColor(priceChange)}>
+                      {formatPercent(priceChange)}
                     </TableTd>
-                    <TableTd ta="right" ff="monospace" c={changeColor(row.oiChange24h)}>
-                      {formatPercent(row.oiChange24h)}
+                    <TableTd ta="right" ff="monospace" c={changeColor(oiChange)}>
+                      {formatPercent(oiChange)}
                     </TableTd>
                     <TableTd ta="right" ff="monospace" visibleFrom="sm">
                       {formatCompactUsd(row.volume24h)}
