@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Container, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import { IconArrowsLeftRight, IconCalculator, IconChartLine, IconGasStation } from "@tabler/icons-react";
+import { IconArrowsLeftRight, IconCalculator, IconChartLine, IconGasStation, IconTarget } from "@tabler/icons-react";
 import { CardLink } from "@/components/common/Links";
 import { defaultOgImages } from "@/config/site";
 
@@ -12,6 +12,13 @@ export const metadata: Metadata = {
 };
 
 const tools = [
+  {
+    href: "/tools/position-size",
+    title: "Position size & liquidation",
+    text: "Size a futures trade from your balance and risk, with required margin, liquidation price, max loss and risk-to-reward.",
+    icon: IconTarget,
+    color: "red",
+  },
   {
     href: "/tools/calculator",
     title: "Profit & tax calculator",

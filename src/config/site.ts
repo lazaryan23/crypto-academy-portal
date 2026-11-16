@@ -31,6 +31,7 @@ export const siteConfig = {
     { label: "Options", href: "/options" },
     { label: "ETF flows", href: "/etf-flows" },
     { label: "Compare coins", href: "/compare" },
+    { label: "Position size calculator", href: "/tools/position-size" },
     { label: "DCA calculator", href: "/tools/dca" },
     { label: "Profit calculator", href: "/tools/calculator" },
     { label: "Gas & converter", href: "/tools/gas-converter" },
