@@ -60,12 +60,17 @@ export const SIGNALS: Record<SignalType, SignalInfo> = {
 
 export const SIGNAL_ORDER: Exclude<SignalType, "neutral">[] = ["longs-entering", "shorts-closing", "shorts-entering", "longs-closing"];
 
-export const PRICE_DEADBAND = 0.3;
-export const OI_DEADBAND = 0.5;
+export type SignalWindow = "24h" | "4h";
 
-export function classifySignal(priceChange: number | null, oiChange: number | null): SignalType {
+export const DEADBANDS: Record<SignalWindow, { price: number; oi: number }> = {
+  "24h": { price: 0.3, oi: 0.5 },
+  "4h": { price: 0.15, oi: 0.25 },
+};
+
+export function classifySignal(priceChange: number | null, oiChange: number | null, window: SignalWindow = "24h"): SignalType {
   if (priceChange == null || oiChange == null) return "neutral";
-  if (Math.abs(priceChange) < PRICE_DEADBAND || Math.abs(oiChange) < OI_DEADBAND) return "neutral";
+  const band = DEADBANDS[window];
+  if (Math.abs(priceChange) < band.price || Math.abs(oiChange) < band.oi) return "neutral";
   if (priceChange > 0) return oiChange > 0 ? "longs-entering" : "shorts-closing";
   return oiChange > 0 ? "shorts-entering" : "longs-closing";
 }
