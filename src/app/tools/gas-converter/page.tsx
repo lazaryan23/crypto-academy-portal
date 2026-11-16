@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ChainFeesSection } from "@/components/fees/ChainFeesSection";
+import { ChainFeesSkeleton } from "@/components/fees/ChainFeesBoard";
 import { Suspense } from "react";
 import { Container, SimpleGrid, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { CryptoConverter, type ConverterCoin, type ConverterFiat } from "@/components/tools/CryptoConverter";
@@ -62,9 +64,12 @@ export default function GasConverterPage() {
             Gas tracker &amp; crypto converter
           </Title>
           <Text c="dimmed" size="lg">
-            What it costs to send Bitcoin or Ethereum right now, and what your crypto is worth in dollars, euros, drams or any other coin.
+            What it costs to send a transaction on Bitcoin, Ethereum, its layer 2s and Solana right now, and what your crypto is worth in dollars, euros, drams or any other coin.
           </Text>
         </Stack>
+        <Suspense fallback={<ChainFeesSkeleton />}>
+          <ChainFeesSection />
+        </Suspense>
         <Suspense
           fallback={
             <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
