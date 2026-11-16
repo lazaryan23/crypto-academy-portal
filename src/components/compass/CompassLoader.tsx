@@ -17,7 +17,7 @@ const steps = [
 
 function polar(angle: number, radius: number) {
   const rad = (angle * Math.PI) / 180;
-  return { x: CENTER + radius * Math.sin(rad), y: CENTER - radius * Math.cos(rad) };
+  return { x: Math.round((CENTER + radius * Math.sin(rad)) * 100) / 100, y: Math.round((CENTER - radius * Math.cos(rad)) * 100) / 100 };
 }
 
 const slots = Array.from({ length: RING_SIZE }, (_, i) => polar((360 / RING_SIZE) * i, ORBIT));

@@ -3,17 +3,9 @@ import Link from "next/link";
 import { Box, Container, Group, ScrollArea, Skeleton, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { getFuturesOpenInterestBtc, getGlobalMarket } from "@/lib/coingecko";
-import { getFearGreed } from "@/lib/fear-greed";
+import { fearGreedColor, getFearGreed } from "@/lib/fear-greed";
 import { formatCompactUsd, formatPercent } from "@/lib/format";
 import classes from "./MarketPulse.module.css";
-
-function fearGreedColor(value: number) {
-  if (value < 25) return "red";
-  if (value < 45) return "orange";
-  if (value <= 55) return "yellow";
-  if (value < 75) return "lime";
-  return "teal";
-}
 
 function PulseItem({
   label,
@@ -81,7 +73,7 @@ function Bar({ children }: { children: ReactNode }) {
 export function MarketPulseSkeleton() {
   return (
     <Bar>
-      {[150, 130, 170, 150].map((w, i) => (
+      {[150, 120, 130, 170, 150].map((w, i) => (
         <Skeleton key={i} h={12} w={w} radius="xl" />
       ))}
     </Bar>
@@ -98,6 +90,9 @@ export async function MarketPulse() {
       <PulseItem label="Market cap" tooltip="The combined value of every cryptocurrency CoinGecko tracks, with its change over the last 24 hours.">
         <Value>{global ? formatCompactUsd(global.totalMarketCapUsd) : "—"}</Value>
         {change !== null && <Value color={change >= 0 ? "teal" : "red"}>{formatPercent(change)}</Value>}
+      </PulseItem>
+      <PulseItem label="24h volume" tooltip="Total trading volume across every cryptocurrency CoinGecko tracks over the last 24 hours.">
+        <Value>{global?.totalVolumeUsd ? formatCompactUsd(global.totalVolumeUsd) : "—"}</Value>
       </PulseItem>
       <PulseItem
         label="BTC dominance"

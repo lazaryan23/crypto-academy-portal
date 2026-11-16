@@ -8,6 +8,7 @@ import { MarketTableSkeleton } from "@/components/market/MarketTableSkeleton";
 import { PromoCallout } from "@/components/common/PromoCallout";
 import { HeroSection } from "@/components/home/HeroSection";
 import { MarketCompass } from "@/components/MarketCompass";
+import { SentimentPanel, SentimentPanelSkeleton } from "@/components/sentiment/SentimentPanel";
 import { Reveal } from "@/components/motion/Reveal";
 import { HoverLift } from "@/components/motion/HoverLift";
 import { guides } from "@/content/academy";
@@ -30,6 +31,12 @@ export default function HomePage() {
         <HeroSection />
 
         <MarketCompass />
+
+        <Reveal>
+          <Suspense fallback={<SentimentPanelSkeleton />}>
+            <SentimentPanel />
+          </Suspense>
+        </Reveal>
 
         <Reveal>
           <Stack gap="md" id="markets" style={{ scrollMarginTop: 84 }}>
