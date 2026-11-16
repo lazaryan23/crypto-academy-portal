@@ -23,6 +23,8 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconCompass, IconMoon, IconSun } from "@tabler/icons-react";
 import { siteConfig } from "@/config/site";
+import { AlertsMenu } from "@/components/alerts/AlertsMenu";
+import { AlertsRunner } from "@/components/alerts/AlertsRunner";
 import { CoinSearch } from "./CoinSearch";
 import { GlobalSpotlight, type SpotlightIndex } from "./GlobalSpotlight";
 
@@ -105,6 +107,7 @@ export function SiteShell({
               <Box visibleFrom="xs" w={{ xs: 260, xl: 320 }}>
                 <CoinSearch shortcutHint />
               </Box>
+              <AlertsMenu />
               <ColorSchemeToggle />
             </Group>
           </Group>
@@ -130,6 +133,7 @@ export function SiteShell({
       </AppShellNavbar>
 
       <GlobalSpotlight index={spotlightIndex} />
+      <AlertsRunner />
       <AppShellMain>
         {pulse}
         <Box mih="calc(100dvh - 100px)">{children}</Box>

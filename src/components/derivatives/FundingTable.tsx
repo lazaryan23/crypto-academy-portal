@@ -21,6 +21,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconSearch, IconSelector } from "@tabler/icons-react";
+import { WatchlistButton } from "@/components/common/WatchlistButton";
 import type { DerivativesRow } from "@/lib/derivatives-market";
 import { funding8hToApr, toFunding8h, toFundingApr, VENUES, type Venue, type VenueQuote } from "@/lib/funding";
 import { changeColor, formatCompactUsd, formatPercent, formatPrice } from "@/lib/format";
@@ -230,6 +231,7 @@ export function FundingTable({ rows, selected, onSelect }: { rows: DerivativesRo
                   </TableTd>
                   <TableTd style={stickyCell(isSelected)}>
                     <Group gap="xs" wrap="nowrap">
+                      <WatchlistButton coinId={row.id} coinName={row.name} size="sm" />
                       <Avatar src={row.image} size={22} alt="" />
                       <Anchor
                         component={Link}

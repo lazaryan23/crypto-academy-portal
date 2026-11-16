@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Avatar, Badge, Box, Group, SegmentedControl, Stack, Text, Tooltip, UnstyledButton } from "@mantine/core";
+import { WatchlistButton } from "@/components/common/WatchlistButton";
 import type { DerivativesRow } from "@/lib/derivatives-market";
 import { funding8hToApr, toFunding8h, toFundingApr, VENUES, type Venue } from "@/lib/funding";
 import { BASELINE_APR, formatApr, formatFundingRate, fundingHeat } from "./format";
@@ -79,7 +80,7 @@ function Legend() {
 export function FundingHeatmap({ rows, onSelect }: { rows: DerivativesRow[]; onSelect: (symbol: string) => void }) {
   const [display, setDisplay] = useState<Display>("rate");
   const top = useMemo(() => [...rows].sort((a, b) => (b.totalOiUsd ?? 0) - (a.totalOiUsd ?? 0)).slice(0, ROWS), [rows]);
-  const columns = `minmax(92px, 1.1fr) repeat(${VENUES.length + 1}, minmax(78px, 1fr)) minmax(120px, 1.2fr)`;
+  const columns = `minmax(118px, 1.1fr) repeat(${VENUES.length + 1}, minmax(78px, 1fr)) minmax(120px, 1.2fr)`;
 
   return (
     <Stack gap="sm">
@@ -116,14 +117,17 @@ export function FundingHeatmap({ rows, onSelect }: { rows: DerivativesRow[]; onS
             const arb = arbitrage(row);
             return (
               <Box key={row.id} style={{ display: "contents" }} role="row">
-                <UnstyledButton onClick={() => onSelect(row.symbol)} aria-label={`Chart ${row.name} funding history`}>
-                  <Group gap={6} wrap="nowrap">
-                    <Avatar src={row.image} size={20} alt="" />
-                    <Text size="sm" fw={700}>
-                      {row.symbol}
-                    </Text>
-                  </Group>
-                </UnstyledButton>
+                <Group gap={2} wrap="nowrap">
+                  <WatchlistButton coinId={row.id} coinName={row.name} size="sm" />
+                  <UnstyledButton onClick={() => onSelect(row.symbol)} aria-label={`Chart ${row.name} funding history`}>
+                    <Group gap={6} wrap="nowrap">
+                      <Avatar src={row.image} size={20} alt="" />
+                      <Text size="sm" fw={700}>
+                        {row.symbol}
+                      </Text>
+                    </Group>
+                  </UnstyledButton>
+                </Group>
                 {VENUES.map((venue) => (
                   <Cell key={venue} venue={venue} row={row} display={display} />
                 ))}

@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Badge, Group, Paper, ProgressRoot, ProgressSection, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Badge, Chip, Group, Paper, ProgressRoot, ProgressSection, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
+import { IconStarFilled } from "@tabler/icons-react";
 import { useInterval } from "@mantine/hooks";
 import { RelativeTime } from "@/components/common/RelativeTime";
 import type { DerivativesHistory, HistoryRange } from "@/lib/derivatives-history";
 import type { DerivativesOverview, DerivativesRow } from "@/lib/derivatives-market";
 import { funding8hToApr } from "@/lib/funding";
 import { formatCompactUsd } from "@/lib/format";
+import { useWatchlist } from "@/lib/watchlist";
 import { FundingHeatmap } from "./FundingHeatmap";
 import { FundingTable } from "./FundingTable";
 import { HistoryPanel, type HistoryState } from "./HistoryPanel";
@@ -127,6 +129,8 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
   const [picked, setPicked] = useState<string | null>(null);
   const [range, setRange] = useState<HistoryRange>("7d");
   const [fundingView, setFundingView] = useState<"heatmap" | "table">("heatmap");
+  const [watchOnly, setWatchOnly] = useState(false);
+  const { ids: watchlist } = useWatchlist();
   const [histories, setHistories] = useState<Record<string, HistoryState>>(() =>
     initialHistory ? { [`${initialHistory.base}:7d`]: { status: "ok", data: initialHistory } } : {},
   );
@@ -175,6 +179,10 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
     if (scroll) panel.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
+  const watched = useMemo(() => new Set(watchlist), [watchlist]);
+  const tableRows = useMemo(() => (watchOnly ? overview.rows.filter((row) => watched.has(row.id)) : overview.rows), [watchOnly, watched, overview.rows]);
+  const watchedCount = useMemo(() => overview.rows.filter((row) => watched.has(row.id)).length, [overview.rows, watched]);
+
   const options = useMemo(() => overview.rows.map((row) => ({ value: row.symbol, label: `${row.symbol} · ${row.name}` })), [overview.rows]);
 
   return (
@@ -201,6 +209,16 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
             Funding rates &amp; open interest by exchange
           </Text>
           <Group gap="xs">
+            <Chip
+              size="xs"
+              checked={watchOnly}
+              onChange={setWatchOnly}
+              color="yellow"
+              icon={<IconStarFilled size={12} />}
+              disabled={!watchedCount && !watchOnly}
+            >
+              Watchlist{watchedCount ? ` (${watchedCount})` : ""}
+            </Chip>
             <SegmentedControl
               size="xs"
               value={fundingView}
@@ -222,17 +240,22 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
           </Group>
         </Group>
         <Text size="sm" c="dimmed">
-          Positive funding means longs pay shorts; negative means shorts pay longs. Click a row to chart its history. Exchanges settle every 1, 4 or 8 hours, so the
-          average converts every rate to an 8-hour equivalent.
+          Positive funding means longs pay shorts; negative means shorts pay longs. Click a row to chart its history. Exchanges settle every 1, 4 or 8 hours, so
+          the average converts every rate to an 8-hour equivalent.
         </Text>
         {fundingView === "heatmap" ? (
-          <FundingHeatmap rows={overview.rows} onSelect={(symbol) => choose(symbol, true)} />
+          <FundingHeatmap rows={tableRows} onSelect={(symbol) => choose(symbol, true)} />
         ) : (
-          <FundingTable rows={overview.rows} selected={selected} onSelect={(symbol) => choose(symbol, true)} />
+          <FundingTable rows={tableRows} selected={selected} onSelect={(symbol) => choose(symbol, true)} />
+        )}
+        {watchOnly && !tableRows.length && (
+          <Text size="sm" c="dimmed" ta="center" py="md">
+            None of your watchlist coins trade as perpetual futures on these exchanges.
+          </Text>
         )}
       </Stack>
 
-      <SignalScreener rows={overview.rows} onSelect={(symbol) => choose(symbol, true)} />
+      <SignalScreener rows={tableRows} onSelect={(symbol) => choose(symbol, true)} />
     </Stack>
   );
 }
