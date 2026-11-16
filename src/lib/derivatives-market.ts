@@ -15,6 +15,7 @@ export interface DerivativesRow {
   rank: number | null;
   price: number | null;
   change24h: number | null;
+  volume24h: number | null;
   venues: Partial<Record<Venue, VenueQuote>>;
   totalOiUsd: number | null;
   oiChange24h: number | null;
@@ -297,6 +298,7 @@ function buildRow(coin: CoinMarket, venues: Partial<Record<Venue, VenueQuote>>, 
     rank: coin.market_cap_rank,
     price: coin.current_price,
     change24h: coin.price_change_percentage_24h_in_currency ?? coin.price_change_percentage_24h,
+    volume24h: coin.total_volume,
     venues,
     totalOiUsd,
     oiChange24h: binanceOi?.change24h ?? null,

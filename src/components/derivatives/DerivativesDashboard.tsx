@@ -10,6 +10,7 @@ import { funding8hToApr } from "@/lib/funding";
 import { formatCompactUsd } from "@/lib/format";
 import { FundingTable } from "./FundingTable";
 import { HistoryPanel, type HistoryState } from "./HistoryPanel";
+import { SignalScreener } from "./SignalScreener";
 import { formatApr, formatFundingRate, fundingColor } from "./format";
 
 const REFRESH_MS = 60_000;
@@ -211,6 +212,8 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
         </Text>
         <FundingTable rows={overview.rows} selected={selected} onSelect={(symbol) => choose(symbol, true)} />
       </Stack>
+
+      <SignalScreener rows={overview.rows} onSelect={(symbol) => choose(symbol, true)} />
     </Stack>
   );
 }
