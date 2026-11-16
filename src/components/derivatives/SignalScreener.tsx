@@ -19,6 +19,7 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
+import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
 import { IconArrowDownRight, IconArrowUpRight, IconChevronDown, IconChevronUp, IconSelector } from "@tabler/icons-react";
 import type { DerivativesRow } from "@/lib/derivatives-market";
 import { changeColor, formatCompactUsd, formatPercent, formatPrice } from "@/lib/format";
@@ -167,9 +168,12 @@ export function SignalScreener({ rows, onSelect }: { rows: DerivativesRow[]; onS
   return (
     <Stack gap="sm" component="section" aria-labelledby="signals-title">
       <Group justify="space-between" gap="xs">
-        <Text fw={700} size="lg" id="signals-title">
-          Market signals: price vs open interest
-        </Text>
+        <Group gap={4} wrap="nowrap">
+          <Text fw={700} size="lg" id="signals-title">
+            Market signals: price vs open interest
+          </Text>
+          <MetricInfoTooltip metric="oiSignals" />
+        </Group>
         <Text size="xs" c="dimmed">
           24h changes · Binance open interest
         </Text>

@@ -19,6 +19,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
+import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
 import { useInterval } from "@mantine/hooks";
 import { IconActivityHeartbeat, IconChartBar } from "@tabler/icons-react";
 import { RelativeTime } from "@/components/common/RelativeTime";
@@ -174,6 +175,7 @@ function LeverageZones({ initial }: { initial: LeverageMap | null }) {
               <Title order={2} size="h3">
                 Estimated liquidation levels
               </Title>
+              <MetricInfoTooltip metric="liquidationClusters" />
               <Badge variant="light" color="orange">
                 Model
               </Badge>

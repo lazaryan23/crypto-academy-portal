@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Alert, Group, Paper, ProgressRoot, ProgressSection, SegmentedControl, Skeleton, Stack, Text, Tooltip } from "@mantine/core";
+import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
 import { IconScale } from "@tabler/icons-react";
 import { LONG_SHORT_COINS, LONG_SHORT_TIMEFRAMES, type LongShortCoin, type LongShortTimeframe } from "@/lib/long-short-config";
 import { useLongShort } from "./useLongShort";
@@ -52,6 +53,7 @@ export function LongShortWidget() {
             <Text fw={700} size="lg" id="long-short-title">
               Long / short ratio
             </Text>
+            <MetricInfoTooltip metric="longShortRatio" />
           </Group>
           <Group gap="xs">
             <SegmentedControl size="xs" value={coin} onChange={(value) => setCoin(value as LongShortCoin)} data={[...LONG_SHORT_COINS]} aria-label="Coin" />

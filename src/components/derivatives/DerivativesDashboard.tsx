@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Badge, Chip, Group, Paper, ProgressRoot, ProgressSection, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
+import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
+import type { MetricKey } from "@/content/metric-glossary";
 import { IconStarFilled } from "@tabler/icons-react";
 import { useInterval } from "@mantine/hooks";
 import { RelativeTime } from "@/components/common/RelativeTime";
@@ -28,12 +30,15 @@ function readCoinParam() {
   return new URLSearchParams(window.location.search).get("coin")?.toUpperCase() ?? null;
 }
 
-function SummaryCard({ label, children }: { label: string; children: React.ReactNode }) {
+function SummaryCard({ label, metric, children }: { label: string; metric?: MetricKey; children: React.ReactNode }) {
   return (
     <Paper withBorder p="md" radius="md">
-      <Text size="xs" c="dimmed" fw={600} mb={6}>
-        {label}
-      </Text>
+      <Group gap={2} mb={6} wrap="nowrap">
+        <Text size="xs" c="dimmed" fw={600}>
+          {label}
+        </Text>
+        {metric && <MetricInfoTooltip metric={metric} size={14} />}
+      </Group>
       {children}
     </Paper>
   );
@@ -68,7 +73,7 @@ function Summary({ overview }: { overview: DerivativesOverview }) {
 
   return (
     <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }} spacing="md">
-      <SummaryCard label="Open interest tracked">
+      <SummaryCard label="Open interest tracked" metric="openInterest">
         <Text fz={24} fw={700} ff="monospace">
           {formatCompactUsd(overview.totalOiUsd)}
         </Text>
@@ -76,7 +81,7 @@ function Summary({ overview }: { overview: DerivativesOverview }) {
           {overview.rows.length} coins across {overview.venuesOnline.length} exchanges{btcShare !== null ? ` · BTC is ${btcShare.toFixed(0)}%` : ""}
         </Text>
       </SummaryCard>
-      <SummaryCard label="Average funding (8h)">
+      <SummaryCard label="Average funding (8h)" metric="fundingRate">
         <Text fz={24} fw={700} ff="monospace" c={fundingColor(weighted)}>
           {formatFundingRate(weighted)}
         </Text>
@@ -95,7 +100,7 @@ function Summary({ overview }: { overview: DerivativesOverview }) {
           </Text>
         </Stack>
       </SummaryCard>
-      <SummaryCard label="BTC long / short accounts">
+      <SummaryCard label="BTC long / short accounts" metric="longShortRatio">
         {ls ? (
           <Stack gap={6}>
             <Group justify="space-between">
@@ -205,9 +210,12 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
 
       <Stack gap="sm">
         <Group justify="space-between" gap="xs">
-          <Text fw={700} size="lg">
-            Funding rates &amp; open interest by exchange
-          </Text>
+          <Group gap={4} wrap="nowrap">
+            <Text fw={700} size="lg">
+              Funding rates &amp; open interest by exchange
+            </Text>
+            <MetricInfoTooltip metric="fundingRate" />
+          </Group>
           <Group gap="xs">
             <Chip
               size="xs"
