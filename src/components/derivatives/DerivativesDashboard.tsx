@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Badge, Group, Paper, ProgressRoot, ProgressSection, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Badge, Group, Paper, ProgressRoot, ProgressSection, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useInterval } from "@mantine/hooks";
 import { RelativeTime } from "@/components/common/RelativeTime";
 import type { DerivativesHistory, HistoryRange } from "@/lib/derivatives-history";
 import type { DerivativesOverview, DerivativesRow } from "@/lib/derivatives-market";
 import { funding8hToApr } from "@/lib/funding";
 import { formatCompactUsd } from "@/lib/format";
+import { FundingHeatmap } from "./FundingHeatmap";
 import { FundingTable } from "./FundingTable";
 import { HistoryPanel, type HistoryState } from "./HistoryPanel";
 import { SignalScreener } from "./SignalScreener";
@@ -124,6 +125,7 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
   const [overview, setOverview] = useState(initial);
   const [picked, setPicked] = useState<string | null>(null);
   const [range, setRange] = useState<HistoryRange>("7d");
+  const [fundingView, setFundingView] = useState<"heatmap" | "table">("heatmap");
   const [histories, setHistories] = useState<Record<string, HistoryState>>(() =>
     initialHistory ? { [`${initialHistory.base}:7d`]: { status: "ok", data: initialHistory } } : {},
   );
@@ -196,6 +198,16 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
             Funding rates &amp; open interest by exchange
           </Text>
           <Group gap="xs">
+            <SegmentedControl
+              size="xs"
+              value={fundingView}
+              onChange={(value) => setFundingView(value as "heatmap" | "table")}
+              data={[
+                { value: "heatmap", label: "Heatmap" },
+                { value: "table", label: "Full table" },
+              ]}
+              aria-label="Funding view"
+            />
             {overview.venuesOnline.length < 4 && (
               <Badge color="yellow" variant="light">
                 {4 - overview.venuesOnline.length} exchange{overview.venuesOnline.length === 3 ? "" : "s"} temporarily unavailable
@@ -210,7 +222,11 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
           Positive funding means longs pay shorts; negative means shorts pay longs. Click a row to chart its history. Exchanges settle every 1, 4 or 8 hours, so the
           average converts every rate to an 8-hour equivalent.
         </Text>
-        <FundingTable rows={overview.rows} selected={selected} onSelect={(symbol) => choose(symbol, true)} />
+        {fundingView === "heatmap" ? (
+          <FundingHeatmap rows={overview.rows} onSelect={(symbol) => choose(symbol, true)} />
+        ) : (
+          <FundingTable rows={overview.rows} selected={selected} onSelect={(symbol) => choose(symbol, true)} />
+        )}
       </Stack>
 
       <SignalScreener rows={overview.rows} onSelect={(symbol) => choose(symbol, true)} />

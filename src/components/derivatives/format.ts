@@ -25,3 +25,18 @@ export function utcTime(timestamp: number | null) {
   if (!timestamp) return null;
   return `${new Date(timestamp).toISOString().slice(11, 16)} UTC`;
 }
+
+export const BASELINE_APR = 10.95;
+
+export function fundingHeat(apr: number | null) {
+  if (apr === null || !Number.isFinite(apr)) return undefined;
+  if (apr < 0) {
+    const alpha = Math.min(Math.abs(apr) / 30, 1) * 0.5 + 0.12;
+    return `hsla(152, 70%, 42%, ${alpha.toFixed(3)})`;
+  }
+  if (apr <= BASELINE_APR + 1) return "hsla(210, 10%, 50%, 0.10)";
+  const heat = Math.min((apr - BASELINE_APR) / 50, 1);
+  const hue = 48 - heat * 48;
+  const alpha = 0.18 + heat * 0.45;
+  return `hsla(${hue.toFixed(0)}, 90%, 52%, ${alpha.toFixed(3)})`;
+}
