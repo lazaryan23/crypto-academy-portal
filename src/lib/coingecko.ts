@@ -231,6 +231,7 @@ export interface GlobalMarket {
   marketCapChange24h: number | null;
   totalVolumeUsd: number | null;
   btcDominance: number | null;
+  ethDominance: number | null;
   btcPriceUsd: number | null;
 }
 
@@ -259,6 +260,7 @@ async function cachedGlobal(): Promise<Result<GlobalMarket>> {
       marketCapChange24h: market_cap_change_percentage_24h_usd ?? null,
       totalVolumeUsd: total_volume.usd ?? null,
       btcDominance: market_cap_percentage.btc ?? null,
+      ethDominance: market_cap_percentage.eth ?? null,
       btcPriceUsd: total_market_cap.btc ? total_market_cap.usd / total_market_cap.btc : null,
     },
   };

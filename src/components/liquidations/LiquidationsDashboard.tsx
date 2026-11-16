@@ -19,10 +19,11 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
+import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
 import { useInterval } from "@mantine/hooks";
 import { IconActivityHeartbeat, IconChartBar } from "@tabler/icons-react";
 import { RelativeTime } from "@/components/common/RelativeTime";
-import type { LeverageMap } from "@/lib/leverage-map";
+import type { LeverageMap, MapRange } from "@/lib/leverage-map";
 import { LIQUIDATION_EXCHANGES, type LiquidationEvent, type LiquidationTally } from "@/lib/liquidation-feed";
 import type { LiquidationSetup, RecentLiquidations } from "@/lib/liquidations";
 import { formatCompactUsd, formatPrice } from "@/lib/format";
@@ -143,22 +144,24 @@ function levelWithin(map: LeverageMap, pct: number, side: "long" | "short") {
 
 function LeverageZones({ initial }: { initial: LeverageMap | null }) {
   const [coin, setCoin] = useState("BTC");
-  const [maps, setMaps] = useState<Record<string, MapState>>(() => (initial ? { [initial.base]: { status: "ok", data: initial } } : {}));
-  const state: MapState = maps[coin] ?? { status: "loading" };
+  const [range, setRange] = useState<MapRange>("7d");
+  const [maps, setMaps] = useState<Record<string, MapState>>(() => (initial ? { [`${initial.base}:${initial.range}`]: { status: "ok", data: initial } } : {}));
+  const key = `${coin}:${range}`;
+  const state: MapState = maps[key] ?? { status: "loading" };
 
   useEffect(() => {
-    if (maps[coin]) return;
+    if (maps[key]) return;
     let active = true;
-    fetch(`/api/liquidations/map/${coin.toLowerCase()}`)
+    fetch(`/api/liquidations/map/${coin.toLowerCase()}?range=${range}`)
       .then(async (res): Promise<MapState> => (res.ok ? { status: "ok", data: (await res.json()) as LeverageMap } : { status: "error" }))
       .catch((): MapState => ({ status: "error" }))
       .then((result) => {
-        if (active) setMaps((prev) => ({ ...prev, [coin]: result }));
+        if (active) setMaps((prev) => ({ ...prev, [key]: result }));
       });
     return () => {
       active = false;
     };
-  }, [coin, maps]);
+  }, [coin, range, key, maps]);
 
   const data = state.status === "ok" ? state.data : null;
 
@@ -172,16 +175,28 @@ function LeverageZones({ initial }: { initial: LeverageMap | null }) {
               <Title order={2} size="h3">
                 Estimated liquidation levels
               </Title>
+              <MetricInfoTooltip metric="liquidationClusters" />
               <Badge variant="light" color="orange">
                 Model
               </Badge>
             </Group>
             <Text size="sm" c="dimmed" maw={680}>
-              Where leveraged positions opened over the last 7 days would be force-closed, assuming a typical mix of 10×, 25×, 50× and 100× leverage. Tall bars are price
+              Where leveraged positions opened over the last {range === "24h" ? "24 hours" : "7 days"} would be force-closed, assuming a typical mix of 10×, 25×, 50× and 100× leverage. Tall bars are price
               levels that could trigger a cascade if reached.
             </Text>
           </Stack>
-          <SegmentedControl value={coin} onChange={setCoin} data={MAP_COINS} aria-label="Coin" />
+          <Group gap="xs">
+            <SegmentedControl value={coin} onChange={setCoin} data={MAP_COINS} aria-label="Coin" />
+            <SegmentedControl
+              value={range}
+              onChange={(value) => setRange(value as MapRange)}
+              data={[
+                { value: "24h", label: "24H" },
+                { value: "7d", label: "7D" },
+              ]}
+              aria-label="Lookback"
+            />
+          </Group>
         </Group>
 
         {data && (
@@ -208,7 +223,7 @@ function LeverageZones({ initial }: { initial: LeverageMap | null }) {
         ) : (
           <Box pos="relative" mih={380}>
             <LoadingOverlay visible={state.status === "loading"} overlayProps={{ blur: 1, backgroundOpacity: 0.2 }} />
-            {data && <LeverageMapChart map={data} />}
+            {data && <LeverageMapChart key={key} map={data} />}
           </Box>
         )}
 

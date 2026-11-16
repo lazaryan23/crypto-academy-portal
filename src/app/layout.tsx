@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, JetBrains_Mono, Rethink_Sans } from "next/font/google";
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
 import "@mantine/spotlight/styles.css";
+import "@mantine/notifications/styles.css";
 import "./globals.css";
 import { theme } from "@/theme";
 import { siteConfig } from "@/config/site";
@@ -105,6 +107,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <GoogleAnalytics />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd).replace(/</g, "\\u003c") }} />
         <MantineProvider theme={theme} defaultColorScheme="dark">
+          <Notifications position="top-right" zIndex={1000} />
           <MotionProvider>
             <SiteShell
               footer={<SiteFooter />}

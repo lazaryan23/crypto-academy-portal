@@ -24,6 +24,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
 import { IconChartBar, IconWaveSine } from "@tabler/icons-react";
 import { RelativeTime } from "@/components/common/RelativeTime";
 import { expectedDailyMove, formatStrike, mergeStrikes, OPTION_CURRENCIES, ratio, type ExpirySummary, type OptionCurrency, type OptionsOverview } from "@/lib/options-math";
@@ -297,6 +298,7 @@ export function OptionsDashboard({ initial }: { initial: OptionsOverview }) {
                       <Title order={2} size="h3">
                         Open interest by strike
                       </Title>
+                      <MetricInfoTooltip metric="maxPain" />
                     </Group>
                     <Text size="sm" c="dimmed" maw={640}>
                       Where options traders are positioned. Big call walls above spot and put walls below often act as magnets or barriers into expiry.

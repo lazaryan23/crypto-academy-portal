@@ -1,15 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Badge, Group, Paper, ProgressRoot, ProgressSection, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Badge, Chip, Group, Paper, ProgressRoot, ProgressSection, SegmentedControl, SimpleGrid, Stack, Text } from "@mantine/core";
+import { MetricInfoTooltip } from "@/components/common/MetricInfoTooltip";
+import type { MetricKey } from "@/content/metric-glossary";
+import { IconStarFilled } from "@tabler/icons-react";
 import { useInterval } from "@mantine/hooks";
 import { RelativeTime } from "@/components/common/RelativeTime";
 import type { DerivativesHistory, HistoryRange } from "@/lib/derivatives-history";
 import type { DerivativesOverview, DerivativesRow } from "@/lib/derivatives-market";
 import { funding8hToApr } from "@/lib/funding";
 import { formatCompactUsd } from "@/lib/format";
+import { useWatchlist } from "@/lib/watchlist";
+import { FundingHeatmap } from "./FundingHeatmap";
 import { FundingTable } from "./FundingTable";
 import { HistoryPanel, type HistoryState } from "./HistoryPanel";
+import { LongShortWidget } from "./LongShortWidget";
+import { SignalScreener } from "./SignalScreener";
 import { formatApr, formatFundingRate, fundingColor } from "./format";
 
 const REFRESH_MS = 60_000;
@@ -23,12 +30,15 @@ function readCoinParam() {
   return new URLSearchParams(window.location.search).get("coin")?.toUpperCase() ?? null;
 }
 
-function SummaryCard({ label, children }: { label: string; children: React.ReactNode }) {
+function SummaryCard({ label, metric, children }: { label: string; metric?: MetricKey; children: React.ReactNode }) {
   return (
     <Paper withBorder p="md" radius="md">
-      <Text size="xs" c="dimmed" fw={600} mb={6}>
-        {label}
-      </Text>
+      <Group gap={2} mb={6} wrap="nowrap">
+        <Text size="xs" c="dimmed" fw={600}>
+          {label}
+        </Text>
+        {metric && <MetricInfoTooltip metric={metric} size={14} />}
+      </Group>
       {children}
     </Paper>
   );
@@ -63,7 +73,7 @@ function Summary({ overview }: { overview: DerivativesOverview }) {
 
   return (
     <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }} spacing="md">
-      <SummaryCard label="Open interest tracked">
+      <SummaryCard label="Open interest tracked" metric="openInterest">
         <Text fz={24} fw={700} ff="monospace">
           {formatCompactUsd(overview.totalOiUsd)}
         </Text>
@@ -71,7 +81,7 @@ function Summary({ overview }: { overview: DerivativesOverview }) {
           {overview.rows.length} coins across {overview.venuesOnline.length} exchanges{btcShare !== null ? ` · BTC is ${btcShare.toFixed(0)}%` : ""}
         </Text>
       </SummaryCard>
-      <SummaryCard label="Average funding (8h)">
+      <SummaryCard label="Average funding (8h)" metric="fundingRate">
         <Text fz={24} fw={700} ff="monospace" c={fundingColor(weighted)}>
           {formatFundingRate(weighted)}
         </Text>
@@ -90,7 +100,7 @@ function Summary({ overview }: { overview: DerivativesOverview }) {
           </Text>
         </Stack>
       </SummaryCard>
-      <SummaryCard label="BTC long / short accounts">
+      <SummaryCard label="BTC long / short accounts" metric="longShortRatio">
         {ls ? (
           <Stack gap={6}>
             <Group justify="space-between">
@@ -123,6 +133,9 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
   const [overview, setOverview] = useState(initial);
   const [picked, setPicked] = useState<string | null>(null);
   const [range, setRange] = useState<HistoryRange>("7d");
+  const [fundingView, setFundingView] = useState<"heatmap" | "table">("heatmap");
+  const [watchOnly, setWatchOnly] = useState(false);
+  const { ids: watchlist } = useWatchlist();
   const [histories, setHistories] = useState<Record<string, HistoryState>>(() =>
     initialHistory ? { [`${initialHistory.base}:7d`]: { status: "ok", data: initialHistory } } : {},
   );
@@ -171,11 +184,17 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
     if (scroll) panel.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
+  const watched = useMemo(() => new Set(watchlist), [watchlist]);
+  const tableRows = useMemo(() => (watchOnly ? overview.rows.filter((row) => watched.has(row.id)) : overview.rows), [watchOnly, watched, overview.rows]);
+  const watchedCount = useMemo(() => overview.rows.filter((row) => watched.has(row.id)).length, [overview.rows, watched]);
+
   const options = useMemo(() => overview.rows.map((row) => ({ value: row.symbol, label: `${row.symbol} · ${row.name}` })), [overview.rows]);
 
   return (
     <Stack gap="xl">
       <Summary overview={overview} />
+
+      <LongShortWidget />
 
       <div ref={panel} style={{ scrollMarginTop: 80 }}>
         <HistoryPanel
@@ -191,10 +210,33 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
 
       <Stack gap="sm">
         <Group justify="space-between" gap="xs">
-          <Text fw={700} size="lg">
-            Funding rates &amp; open interest by exchange
-          </Text>
+          <Group gap={4} wrap="nowrap">
+            <Text fw={700} size="lg">
+              Funding rates &amp; open interest by exchange
+            </Text>
+            <MetricInfoTooltip metric="fundingRate" />
+          </Group>
           <Group gap="xs">
+            <Chip
+              size="xs"
+              checked={watchOnly}
+              onChange={setWatchOnly}
+              color="yellow"
+              icon={<IconStarFilled size={12} />}
+              disabled={!watchedCount && !watchOnly}
+            >
+              Watchlist{watchedCount ? ` (${watchedCount})` : ""}
+            </Chip>
+            <SegmentedControl
+              size="xs"
+              value={fundingView}
+              onChange={(value) => setFundingView(value as "heatmap" | "table")}
+              data={[
+                { value: "heatmap", label: "Heatmap" },
+                { value: "table", label: "Full table" },
+              ]}
+              aria-label="Funding view"
+            />
             {overview.venuesOnline.length < 4 && (
               <Badge color="yellow" variant="light">
                 {4 - overview.venuesOnline.length} exchange{overview.venuesOnline.length === 3 ? "" : "s"} temporarily unavailable
@@ -206,11 +248,22 @@ export function DerivativesDashboard({ initial, initialHistory }: { initial: Der
           </Group>
         </Group>
         <Text size="sm" c="dimmed">
-          Positive funding means longs pay shorts; negative means shorts pay longs. Click a row to chart its history. Exchanges settle every 1, 4 or 8 hours, so the
-          average converts every rate to an 8-hour equivalent.
+          Positive funding means longs pay shorts; negative means shorts pay longs. Click a row to chart its history. Exchanges settle every 1, 4 or 8 hours, so
+          the average converts every rate to an 8-hour equivalent.
         </Text>
-        <FundingTable rows={overview.rows} selected={selected} onSelect={(symbol) => choose(symbol, true)} />
+        {fundingView === "heatmap" ? (
+          <FundingHeatmap rows={tableRows} onSelect={(symbol) => choose(symbol, true)} />
+        ) : (
+          <FundingTable rows={tableRows} selected={selected} onSelect={(symbol) => choose(symbol, true)} />
+        )}
+        {watchOnly && !tableRows.length && (
+          <Text size="sm" c="dimmed" ta="center" py="md">
+            None of your watchlist coins trade as perpetual futures on these exchanges.
+          </Text>
+        )}
       </Stack>
+
+      <SignalScreener rows={tableRows} onSelect={(symbol) => choose(symbol, true)} />
     </Stack>
   );
 }

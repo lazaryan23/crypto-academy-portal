@@ -73,7 +73,7 @@ export default function OptionsPage() {
         <Suspense fallback={<OptionsSkeleton />}>
           <OptionsLoader />
         </Suspense>
-        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md" id="options-explained" style={{ scrollMarginTop: 84 }}>
           {explainers.map((item) => (
             <Paper key={item.title} withBorder p="lg" radius="md">
               <Title order={2} size="h4" mb={6}>

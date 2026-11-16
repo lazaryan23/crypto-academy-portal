@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Box, Group, Paper, Stack, Text } from "@mantine/core";
+import { Box, Chip, Group, Paper, Stack, Text } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
-import type { LeverageMap } from "@/lib/leverage-map";
+import type { LeverageBucket, LeverageMap } from "@/lib/leverage-map";
 import { formatCompactUsd, formatPrice } from "@/lib/format";
 
 const HEIGHT = 340;
@@ -12,6 +12,19 @@ const WIDE_SIDE = 56;
 const NARROW_SIDE = 4;
 const LONG_COLOR = "var(--mantine-color-red-6)";
 const SHORT_COLOR = "var(--mantine-color-teal-6)";
+const TIER_SHADES = [9, 7, 5, 3];
+
+function tierColor(side: "long" | "short", tier: number) {
+  return `var(--mantine-color-${side === "long" ? "red" : "teal"}-${TIER_SHADES[tier] ?? 6})`;
+}
+
+function sideOf(bucket: LeverageBucket, price: number) {
+  return bucket.price < price ? "long" : "short";
+}
+
+function tierValues(bucket: LeverageBucket, side: "long" | "short") {
+  return side === "long" ? bucket.longByTier : bucket.shortByTier;
+}
 
 function compactPrice(value: number) {
   if (value >= 1000) return `$${(value / 1000).toFixed(value >= 10_000 ? 1 : 2)}K`;
@@ -21,9 +34,15 @@ function compactPrice(value: number) {
 export function LeverageMapChart({ map }: { map: LeverageMap }) {
   const { ref, width } = useElementSize();
   const [hover, setHover] = useState<number | null>(null);
+  const [visibleTiers, setVisibleTiers] = useState<string[]>(() => map.tiers.map(String));
+  const visible = useMemo(
+    () => new Set(map.tiers.map((tier, i) => (visibleTiers.includes(String(tier)) ? i : -1)).filter((i) => i >= 0)),
+    [map.tiers, visibleTiers],
+  );
 
   const geometry = useMemo(() => {
-    const buckets = map.buckets;
+    const sum = (values: number[]) => values.reduce((total, value, i) => (visible.has(i) ? total + value : total), 0);
+    const buckets = map.buckets.map((b) => ({ ...b, longUsd: sum(b.longByTier), shortUsd: sum(b.shortByTier) }));
     const below = buckets.map((b, i) => ({ i, b })).filter(({ b }) => b.price < map.price);
     const above = buckets.map((b, i) => ({ i, b })).filter(({ b }) => b.price >= map.price);
     const cumulative = new Array<number>(buckets.length).fill(0);
@@ -39,8 +58,8 @@ export function LeverageMapChart({ map }: { map: LeverageMap }) {
     }
     const maxBar = Math.max(1, ...buckets.map((b) => Math.max(b.longUsd, b.shortUsd)));
     const maxCumulative = Math.max(1, ...cumulative);
-    return { cumulative, maxBar, maxCumulative };
-  }, [map]);
+    return { buckets, cumulative, maxBar, maxCumulative };
+  }, [map, visible]);
 
   const side = width >= 560 ? WIDE_SIDE : NARROW_SIDE;
   const pad = { ...PAD, left: side, right: side };
@@ -53,19 +72,19 @@ export function LeverageMapChart({ map }: { map: LeverageMap }) {
   const yCum = (usd: number) => PAD.top + plotH - (usd / geometry.maxCumulative) * plotH;
   const barW = Math.max(1, plotW / map.buckets.length - 1.5);
 
-  const longLine = map.buckets
+  const longLine = geometry.buckets
     .map((b, i) => ({ b, i }))
     .filter(({ b }) => b.price < map.price)
     .map(({ b, i }) => `${x(b.price).toFixed(1)},${yCum(geometry.cumulative[i]).toFixed(1)}`)
     .join(" ");
-  const shortLine = map.buckets
+  const shortLine = geometry.buckets
     .map((b, i) => ({ b, i }))
     .filter(({ b }) => b.price >= map.price)
     .map(({ b, i }) => `${x(b.price).toFixed(1)},${yCum(geometry.cumulative[i]).toFixed(1)}`)
     .join(" ");
 
   const ticks = Array.from({ length: 5 }, (_, i) => low + ((high - low) * (i + 0.5)) / 5);
-  const hovered = hover === null ? null : map.buckets[hover];
+  const hovered = hover === null ? null : geometry.buckets[hover];
 
   const onMove = (event: React.PointerEvent<SVGSVGElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -89,28 +108,43 @@ export function LeverageMapChart({ map }: { map: LeverageMap }) {
             style={{ display: "block", touchAction: "pan-y" }}
           >
             {[0.25, 0.5, 0.75, 1].map((f) => (
-              <line key={f} x1={pad.left} x2={pad.left + plotW} y1={PAD.top + plotH * (1 - f)} y2={PAD.top + plotH * (1 - f)} stroke="var(--mantine-color-default-border)" strokeDasharray="2 4" />
+              <line
+                key={f}
+                x1={pad.left}
+                x2={pad.left + plotW}
+                y1={PAD.top + plotH * (1 - f)}
+                y2={PAD.top + plotH * (1 - f)}
+                stroke="var(--mantine-color-default-border)"
+                strokeDasharray="2 4"
+              />
             ))}
-            {map.buckets.map((b, i) => {
-              const usd = b.price < map.price ? b.longUsd : b.shortUsd;
-              if (usd <= 0) return null;
-              const top = yBar(usd);
+            {geometry.buckets.map((b, i) => {
+              const side = sideOf(b, map.price);
+              const values = tierValues(b, side);
+              let stacked = 0;
               return (
-                <rect
-                  key={i}
-                  x={x(b.price) - barW / 2}
-                  y={top}
-                  width={barW}
-                  height={PAD.top + plotH - top}
-                  rx={1}
-                  fill={b.price < map.price ? LONG_COLOR : SHORT_COLOR}
-                  opacity={hover === null || hover === i ? 0.85 : 0.45}
-                />
+                <g key={i} opacity={hover === null || hover === i ? 0.9 : 0.45}>
+                  {values.map((usd, tier) => {
+                    if (!visible.has(tier) || usd <= 0) return null;
+                    const bottom = yBar(stacked);
+                    stacked += usd;
+                    const top = yBar(stacked);
+                    return <rect key={tier} x={x(b.price) - barW / 2} y={top} width={barW} height={Math.max(0.5, bottom - top)} fill={tierColor(side, tier)} />;
+                  })}
+                </g>
               );
             })}
             {longLine && <polyline points={longLine} fill="none" stroke={LONG_COLOR} strokeWidth={2} strokeOpacity={0.9} />}
             {shortLine && <polyline points={shortLine} fill="none" stroke={SHORT_COLOR} strokeWidth={2} strokeOpacity={0.9} />}
-            <line x1={x(map.price)} x2={x(map.price)} y1={PAD.top - 6} y2={PAD.top + plotH} stroke="var(--mantine-color-text)" strokeDasharray="4 3" strokeWidth={1.2} />
+            <line
+              x1={x(map.price)}
+              x2={x(map.price)}
+              y1={PAD.top - 6}
+              y2={PAD.top + plotH}
+              stroke="var(--mantine-color-text)"
+              strokeDasharray="4 3"
+              strokeWidth={1.2}
+            />
             <text x={x(map.price)} y={PAD.top - 6} textAnchor="middle" fontSize={11} fontWeight={700} fill="var(--mantine-color-text)" dy={-2}>
               {formatPrice(map.price)}
             </text>
@@ -119,7 +153,13 @@ export function LeverageMapChart({ map }: { map: LeverageMap }) {
                 {compactPrice(tick)}
               </text>
             ))}
-            <text x={side === WIDE_SIDE ? pad.left - 8 : 2} y={PAD.top + 10} textAnchor={side === WIDE_SIDE ? "end" : "start"} fontSize={11} fill="var(--mantine-color-dimmed)">
+            <text
+              x={side === WIDE_SIDE ? pad.left - 8 : 2}
+              y={PAD.top + 10}
+              textAnchor={side === WIDE_SIDE ? "end" : "start"}
+              fontSize={11}
+              fill="var(--mantine-color-dimmed)"
+            >
               {formatCompactUsd(geometry.maxBar)}
             </text>
             <text x={width - 2} y={PAD.top + 10} textAnchor="end" fontSize={11} fill="var(--mantine-color-dimmed)">
@@ -152,6 +192,16 @@ export function LeverageMapChart({ map }: { map: LeverageMap }) {
               <Text size="xs" c="dimmed">
                 {(((hovered.price - map.price) / map.price) * 100).toFixed(1)}% from current price
               </Text>
+              {map.tiers.map((tier, i) =>
+                visible.has(i) ? (
+                  <Group key={tier} gap={6} wrap="nowrap">
+                    <Box w={8} h={8} style={{ borderRadius: 2, background: tierColor(sideOf(hovered, map.price), i) }} />
+                    <Text size="xs">
+                      {tier}x: <b>{formatCompactUsd(tierValues(hovered, sideOf(hovered, map.price))[i])}</b>
+                    </Text>
+                  </Group>
+                ) : null,
+              )}
               {hovered.price < map.price ? (
                 <>
                   <Text size="xs">
@@ -175,21 +225,22 @@ export function LeverageMapChart({ map }: { map: LeverageMap }) {
           </Paper>
         )}
       </Box>
-      <Group gap="lg">
-        <Group gap={6} wrap="nowrap">
-          <Box w={10} h={10} style={{ borderRadius: 2, background: LONG_COLOR }} />
-          <Text size="xs" c="dimmed">
-            Long liquidations
-          </Text>
-        </Group>
-        <Group gap={6} wrap="nowrap">
-          <Box w={10} h={10} style={{ borderRadius: 2, background: SHORT_COLOR }} />
-          <Text size="xs" c="dimmed">
-            Short liquidations
-          </Text>
-        </Group>
+      <Group justify="space-between" gap="sm">
+        <Chip.Group multiple value={visibleTiers} onChange={(next) => next.length && setVisibleTiers(next)}>
+          <Group gap={6}>
+            {map.tiers.map((tier, i) => (
+              <Chip key={tier} value={String(tier)} size="xs" variant="outline">
+                <Group gap={4} wrap="nowrap" component="span">
+                  <Box component="span" w={8} h={8} style={{ borderRadius: 2, background: tierColor("long", i), display: "inline-block" }} />
+                  <Box component="span" w={8} h={8} style={{ borderRadius: 2, background: tierColor("short", i), display: "inline-block" }} />
+                  {tier}x
+                </Group>
+              </Chip>
+            ))}
+          </Group>
+        </Chip.Group>
         <Text size="xs" c="dimmed">
-          Lines: cumulative from current price (right axis)
+          Red: long liquidations · green: short liquidations · lines: cumulative from current price (right axis)
         </Text>
       </Group>
     </Stack>
