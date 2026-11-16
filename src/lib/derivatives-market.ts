@@ -42,7 +42,7 @@ const BINANCE = "https://fapi.binance.com";
 const SUCCESS_LIFE = { stale: 60, revalidate: 60, expire: 600 };
 const FAILURE_LIFE = { stale: 0, revalidate: 20, expire: 300 };
 
-const noPerpetualSymbols = new Set([
+export const noPerpetualSymbols = new Set([
   "USDT", "USDC", "DAI", "FDUSD", "USDE", "USDS", "SUSDE", "SUSDS", "TUSD", "PYUSD", "USD1", "RLUSD", "USDD", "GHO", "FRAX", "USDX", "USDG",
   "USDF", "BFUSD", "EURC", "USDTB", "BUSD", "USDP", "LUSD", "CRVUSD", "WBTC", "WETH", "STETH", "WSTETH", "WEETH", "CBBTC", "BSC-USD", "XAUT", "PAXG",
 ]);

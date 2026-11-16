@@ -7,6 +7,7 @@ import { MarketDashboard } from "@/components/market/MarketDashboard";
 import { MarketTableSkeleton } from "@/components/market/MarketTableSkeleton";
 import { PromoCallout } from "@/components/common/PromoCallout";
 import { HeroSection } from "@/components/home/HeroSection";
+import { MarketCompass } from "@/components/MarketCompass";
 import { Reveal } from "@/components/motion/Reveal";
 import { HoverLift } from "@/components/motion/HoverLift";
 import { guides } from "@/content/academy";
@@ -27,6 +28,8 @@ export default function HomePage() {
     <Container size="xl" py="xl">
       <Stack gap={56}>
         <HeroSection />
+
+        <MarketCompass />
 
         <Reveal>
           <Stack gap="md" id="markets" style={{ scrollMarginTop: 84 }}>
