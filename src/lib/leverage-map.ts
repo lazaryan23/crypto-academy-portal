@@ -10,29 +10,37 @@ export const LEVERAGE_TIERS = [
 export const MAP_COINS = ["BTC", "ETH", "SOL", "XRP", "DOGE"] as const;
 export type MapCoin = (typeof MAP_COINS)[number];
 
+export const MAP_RANGES = ["24h", "7d"] as const;
+export type MapRange = (typeof MAP_RANGES)[number];
+
+const LOOKBACK_HOURS: Record<MapRange, number> = { "24h": 24, "7d": 168 };
+
 export interface LeverageBucket {
   price: number;
   longUsd: number;
   shortUsd: number;
+  longByTier: number[];
+  shortByTier: number[];
 }
 
 export interface LeverageMap {
   base: MapCoin;
   contract: string;
   price: number;
+  range: MapRange;
   lookbackHours: number;
+  tiers: number[];
   bucketSize: number;
   buckets: LeverageBucket[];
   updatedAt: string;
 }
 
 const TIMEOUT_MS = 8000;
-const LOOKBACK_HOURS = 168;
 const RANGE = 0.12;
 const BUCKETS = 60;
 const MAINTENANCE = 0.005;
 
-type Level = { price: number; side: "long" | "short"; usd: number };
+type Level = { price: number; side: "long" | "short"; usd: number; tier: number };
 
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(TIMEOUT_MS) });
@@ -61,10 +69,10 @@ export function buildLevels(
     } else {
       const entry = (candle.open + candle.close) / 2;
       const notional = (current - previous) * entry;
-      for (const tier of LEVERAGE_TIERS) {
-        levels.push({ price: liquidationPrice(entry, tier.leverage, "long"), side: "long", usd: notional * tier.weight });
-        levels.push({ price: liquidationPrice(entry, tier.leverage, "short"), side: "short", usd: notional * tier.weight });
-      }
+      LEVERAGE_TIERS.forEach((tier, index) => {
+        levels.push({ price: liquidationPrice(entry, tier.leverage, "long"), side: "long", usd: notional * tier.weight, tier: index });
+        levels.push({ price: liquidationPrice(entry, tier.leverage, "short"), side: "short", usd: notional * tier.weight, tier: index });
+      });
     }
     levels = levels.filter((level) => (level.side === "long" ? candle.low > level.price : candle.high < level.price));
   }
@@ -74,24 +82,36 @@ export function buildLevels(
 export function bucketLevels(levels: Level[], price: number): { bucketSize: number; buckets: LeverageBucket[] } {
   const low = price * (1 - RANGE);
   const bucketSize = (price * RANGE * 2) / BUCKETS;
-  const buckets: LeverageBucket[] = Array.from({ length: BUCKETS }, (_, i) => ({ price: low + bucketSize * (i + 0.5), longUsd: 0, shortUsd: 0 }));
+  const buckets: LeverageBucket[] = Array.from({ length: BUCKETS }, (_, i) => ({
+    price: low + bucketSize * (i + 0.5),
+    longUsd: 0,
+    shortUsd: 0,
+    longByTier: LEVERAGE_TIERS.map(() => 0),
+    shortByTier: LEVERAGE_TIERS.map(() => 0),
+  }));
   for (const level of levels) {
     const index = Math.floor((level.price - low) / bucketSize);
     if (index < 0 || index >= BUCKETS) continue;
-    if (level.side === "long" && level.price < price) buckets[index].longUsd += level.usd;
-    if (level.side === "short" && level.price > price) buckets[index].shortUsd += level.usd;
+    if (level.side === "long" && level.price < price) {
+      buckets[index].longUsd += level.usd;
+      buckets[index].longByTier[level.tier] += level.usd;
+    }
+    if (level.side === "short" && level.price > price) {
+      buckets[index].shortUsd += level.usd;
+      buckets[index].shortByTier[level.tier] += level.usd;
+    }
   }
   return { bucketSize, buckets };
 }
 
-async function cachedLeverageMap(base: MapCoin): Promise<LeverageMap | null> {
+async function cachedLeverageMap(base: MapCoin, range: MapRange): Promise<LeverageMap | null> {
   "use cache";
   try {
     const api = "https://fapi.binance.com";
     const contract = `${base}USDT`;
     const [klines, oi] = await Promise.all([
-      getJson<[number, string, string, string, string][]>(`${api}/fapi/v1/klines?symbol=${contract}&interval=1h&limit=${LOOKBACK_HOURS}`),
-      getJson<{ sumOpenInterest: string; timestamp: number }[]>(`${api}/futures/data/openInterestHist?symbol=${contract}&period=1h&limit=${LOOKBACK_HOURS}`),
+      getJson<[number, string, string, string, string][]>(`${api}/fapi/v1/klines?symbol=${contract}&interval=1h&limit=${LOOKBACK_HOURS[range]}`),
+      getJson<{ sumOpenInterest: string; timestamp: number }[]>(`${api}/futures/data/openInterestHist?symbol=${contract}&period=1h&limit=${LOOKBACK_HOURS[range]}`),
     ]);
     const oiByHour = new Map(oi.map((row) => [Math.floor(row.timestamp / 3_600_000), Number(row.sumOpenInterest)]));
     const rows = klines
@@ -100,7 +120,7 @@ async function cachedLeverageMap(base: MapCoin): Promise<LeverageMap | null> {
         candle: { open: Number(k[1]), high: Number(k[2]), low: Number(k[3]), close: Number(k[4]) },
       }))
       .filter((row) => oiByHour.has(row.hour) && Object.values(row.candle).every((value) => value > 0));
-    if (rows.length < 24) throw new Error("not enough history");
+    if (rows.length < Math.min(24, LOOKBACK_HOURS[range] - 2)) throw new Error("not enough history");
     const levels = buildLevels(
       rows.map((row) => row.candle),
       rows.map((row) => oiByHour.get(row.hour) ?? 0),
@@ -108,7 +128,17 @@ async function cachedLeverageMap(base: MapCoin): Promise<LeverageMap | null> {
     const price = rows[rows.length - 1].candle.close;
     const { bucketSize, buckets } = bucketLevels(levels, price);
     cacheLife({ stale: 120, revalidate: 300, expire: 3600 });
-    return { base, contract, price, lookbackHours: rows.length, bucketSize, buckets, updatedAt: new Date().toISOString() };
+    return {
+      base,
+      contract,
+      price,
+      range,
+      lookbackHours: rows.length,
+      tiers: LEVERAGE_TIERS.map((tier) => tier.leverage),
+      bucketSize,
+      buckets,
+      updatedAt: new Date().toISOString(),
+    };
   } catch {
     cacheLife({ stale: 0, revalidate: 20, expire: 300 });
     return null;
@@ -119,6 +149,10 @@ export function isMapCoin(value: unknown): value is MapCoin {
   return typeof value === "string" && (MAP_COINS as readonly string[]).includes(value);
 }
 
-export function getLeverageMap(base: MapCoin) {
-  return cachedLeverageMap(base);
+export function isMapRange(value: unknown): value is MapRange {
+  return typeof value === "string" && (MAP_RANGES as readonly string[]).includes(value);
+}
+
+export function getLeverageMap(base: MapCoin, range: MapRange = "7d") {
+  return cachedLeverageMap(base, range);
 }
