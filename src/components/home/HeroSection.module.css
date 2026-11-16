@@ -9,3 +9,14 @@
   line-height: 1.08;
   letter-spacing: -0.025em;
 }
+
+.orbitWrap {
+  width: min(100%, 460px);
+  margin-inline: auto;
+}
+
+@media (max-width: 48em) {
+  .orbitWrap {
+    width: min(64vw, 260px);
+  }
+}

@@ -4,3 +4,32 @@
     0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-filled) 12%, transparent),
     0 24px 60px -32px color-mix(in srgb, var(--mantine-color-brand-filled) 55%, transparent);
 }
+
+.leader,
+.runner {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--hairline);
+  border-radius: var(--mantine-radius-md);
+  transition:
+    border-color 150ms ease-out,
+    background-color 150ms ease-out;
+}
+
+.leader {
+  padding: var(--mantine-spacing-md);
+  background: color-mix(in srgb, var(--mantine-color-brand-filled) 7%, transparent);
+  border-color: color-mix(in srgb, var(--mantine-color-brand-filled) 35%, var(--hairline));
+}
+
+.runner {
+  padding: 8px var(--mantine-spacing-sm);
+}
+
+.leader:hover,
+.leader:focus-visible,
+.runner:hover,
+.runner:focus-visible {
+  border-color: var(--mantine-color-brand-filled);
+  outline: none;
+}
